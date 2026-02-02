@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, TrendingUp, Gift, Store, User, ShoppingCart, ShoppingBag, Bell, ChevronLeft } from "lucide-react";
+import { Home, TrendingUp, Gift, Store, User, ShoppingCart, ShoppingBag, Bell, ChevronLeft, Palette } from "lucide-react";
 import { useAuth, apiCall } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 
@@ -21,9 +21,9 @@ export const BottomNav = () => {
   const navItems = [
     { path: "/", icon: Home, label: "الرئيسية" },
     { path: "/investment", icon: TrendingUp, label: "الاستثمار" },
-    { path: "/cart", icon: ShoppingCart, label: "السلة", showBadge: true },
+    { path: "/gifts", icon: Gift, label: "الهدايا" },
     { path: "/store", icon: Store, label: "المتجر" },
-    { path: "/profile", icon: User, label: "حسابي" },
+    { path: "/designers", icon: Palette, label: "المصممات" },
   ];
 
   return (
@@ -34,18 +34,13 @@ export const BottomNav = () => {
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
-            className={`flex flex-col items-center justify-center gap-1 px-3 py-2 transition-all relative ${isActive ? "text-[#D4AF37]" : "text-[#A1A1AA]"}`}
+            className={`flex flex-col items-center justify-center gap-0.5 px-2 py-1 transition-all relative ${isActive ? "text-[#D4AF37]" : "text-[#A1A1AA]"}`}
             data-testid={`nav-${item.label}`}
           >
             <div className="relative">
-              <item.icon size={22} className={isActive ? "text-[#D4AF37]" : ""} />
-              {item.showBadge && cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#D4AF37] text-black text-xs font-bold rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
+              <item.icon size={20} className={isActive ? "text-[#D4AF37]" : ""} />
             </div>
-            <span className="text-xs font-medium">{item.label}</span>
+            <span className="text-[10px] font-medium">{item.label}</span>
             {isActive && <div className="w-1 h-1 rounded-full bg-[#D4AF37] mt-0.5" />}
           </button>
         );
