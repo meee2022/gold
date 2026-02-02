@@ -280,10 +280,6 @@ async def seed_sample_products():
         {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "jewelry", "title": "سوار ذهب قطري", "description": "سوار ذهب تقليدي", "price_qar": 8200, "karat": 22, "weight_grams": 25, "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400", "merchant_name": "كنوز الخليج", "stock": 12, "category": "أساور", "is_active": True},
         # Jewelry - Earrings
         {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "jewelry", "title": "أقراط ذهب كلاسيكية", "description": "أقراط ذهب نسائية أنيقة", "price_qar": 1800, "karat": 21, "weight_grams": 4, "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400", "merchant_name": "الرميزان", "stock": 18, "category": "أقراط", "is_active": True},
-        # Qatari Products
-        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "qatari", "title": "عود قطري فاخر", "description": "عود طبيعي من أجود الأنواع", "price_qar": 950, "image_url": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400", "merchant_name": "تراث قطر", "stock": 30, "category": "عود وبخور", "is_active": True},
-        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "qatari", "title": "بخور قطري أصيل", "description": "بخور عربي تقليدي", "price_qar": 350, "image_url": "https://images.unsplash.com/photo-1602517623843-7c31c3e3c2b5?w=400", "merchant_name": "تراث قطر", "stock": 50, "category": "عود وبخور", "is_active": True},
-        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "qatari", "title": "دلة قطرية تراثية", "description": "دلة قهوة عربية مطلية بالذهب", "price_qar": 1200, "image_url": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400", "merchant_name": "حرف قطرية", "stock": 15, "category": "تراثيات", "is_active": True},
         # Gifts
         {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "gift", "title": "هدية الزواج", "description": "طقم ذهب للعروس", "price_qar": 15000, "karat": 21, "image_url": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400", "merchant_name": "زينة للهدايا", "stock": 10, "category": "أعراس", "is_active": True},
         {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "gift", "title": "هدية المواليد", "description": "سوار ذهب للمولود الجديد", "price_qar": 2500, "karat": 18, "image_url": "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=400", "merchant_name": "زينة للهدايا", "stock": 20, "category": "مواليد", "is_active": True},
@@ -291,6 +287,40 @@ async def seed_sample_products():
     ]
     await db.products.insert_many(products)
     logger.info("Sample products seeded")
+
+async def seed_designer_products():
+    """Seed products from Qatari designers"""
+    designer_products = [
+        # Clair De Lune - أسماء السعدي
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "خاتم ضوء القمر", "description": "تصميم عصري مستوحى من ضوء القمر", "price_qar": 5200, "karat": 21, "weight_grams": 6, "image_url": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400", "designer_name": "أسماء السعدي", "brand": "كلير دي لون", "stock": 8, "category": "خواتم", "is_active": True},
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "سوار النجوم", "description": "سوار ذهب مرصع بالنجوم", "price_qar": 7800, "karat": 22, "weight_grams": 12, "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400", "designer_name": "أسماء السعدي", "brand": "كلير دي لون", "stock": 5, "category": "أساور", "is_active": True},
+        # De Trove - فاطمة المهندي
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "قلادة الكنز", "description": "قلادة ذهب فاخرة بتصميم فريد", "price_qar": 9500, "karat": 22, "weight_grams": 15, "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400", "designer_name": "فاطمة المهندي", "brand": "دي تروف", "stock": 4, "category": "سلاسل", "is_active": True},
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "أقراط الجوهرة", "description": "أقراط ذهب بتصميم راقي", "price_qar": 4200, "karat": 21, "weight_grams": 5, "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400", "designer_name": "فاطمة المهندي", "brand": "دي تروف", "stock": 10, "category": "أقراط", "is_active": True},
+        # Ghand Jewellery - حصة وجواهر المناعي
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "طقم غند التراثي", "description": "طقم ذهب تراثي قطري أصيل", "price_qar": 18500, "karat": 21, "weight_grams": 35, "image_url": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400", "designer_name": "حصة وجواهر المناعي", "brand": "مجوهرات غند", "stock": 3, "category": "أطقم", "is_active": True},
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "سوار غند الخليجي", "description": "سوار ذهب بنقوش خليجية", "price_qar": 6800, "karat": 22, "weight_grams": 10, "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400", "designer_name": "حصة وجواهر المناعي", "brand": "مجوهرات غند", "stock": 7, "category": "أساور", "is_active": True},
+        # H Jewellery - حمد المحمد
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "خاتم H الرجالي", "description": "خاتم ذهب رجالي فاخر", "price_qar": 5500, "karat": 21, "weight_grams": 9, "image_url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400", "designer_name": "حمد المحمد", "brand": "مجوهرات H", "stock": 6, "category": "خواتم", "is_active": True},
+        # Hessa Jewels - سميرة الملا
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "سلسلة حصة الكلاسيكية", "description": "سلسلة ذهب بتصميم كلاسيكي أنيق", "price_qar": 3800, "karat": 21, "weight_grams": 7, "image_url": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400", "designer_name": "سميرة الملا", "brand": "مجوهرات حصة", "stock": 12, "category": "سلاسل", "is_active": True},
+        # Layla Issam - ليلى أبو عيسى
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "أقراط ليلى العصرية", "description": "أقراط بتصميم عصري مبتكر", "price_qar": 3200, "karat": 18, "weight_grams": 4, "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400", "designer_name": "ليلى أبو عيسى", "brand": "مجوهرات ليلى عصام", "stock": 15, "category": "أقراط", "is_active": True},
+        # Midad - عبد الله يوسف فخرو
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "قلادة مداد بالخط العربي", "description": "قلادة مزينة بالخط العربي", "price_qar": 6200, "karat": 21, "weight_grams": 8, "image_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400", "designer_name": "عبد الله يوسف فخرو", "brand": "مجوهرات مداد", "stock": 9, "category": "سلاسل", "is_active": True},
+        # Nouf Jewellery - نوف المير
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "خاتم نوف الناعم", "description": "خاتم بتصميم ناعم وأنثوي", "price_qar": 2900, "karat": 18, "weight_grams": 4, "image_url": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400", "designer_name": "نوف المير", "brand": "مجوهرات نوف", "stock": 18, "category": "خواتم", "is_active": True},
+        # Trifoglio - فجر العطية
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "سوار تريفوجليو الإيطالي", "description": "سوار بتصميم إيطالي فاخر", "price_qar": 8900, "karat": 22, "weight_grams": 14, "image_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400", "designer_name": "فجر العطية", "brand": "مجوهرات تريفوجليو", "stock": 5, "category": "أساور", "is_active": True},
+        # Thameen - مريم ونورة المعضادي
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "طقم ثمين الراقي", "description": "طقم ذهب راقي للمناسبات", "price_qar": 22000, "karat": 22, "weight_grams": 40, "image_url": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=400", "designer_name": "مريم ونورة المعضادي", "brand": "مجوهرات ثمين", "stock": 2, "category": "أطقم", "is_active": True},
+        # Al Ghara - شيخة الغانم
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "قلادة الغلا الخليجية", "description": "قلادة بتصميم خليجي أصيل", "price_qar": 7500, "karat": 21, "weight_grams": 12, "image_url": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400", "designer_name": "شيخة الغانم", "brand": "مجوهرات الغلا", "stock": 6, "category": "سلاسل", "is_active": True},
+        # DW Jewellery - الدانة حمد الحنزاب
+        {"product_id": f"prod_{uuid.uuid4().hex[:8]}", "type": "designer", "title": "أقراط DW الحديثة", "description": "أقراط بتصميم حديث ومميز", "price_qar": 4500, "karat": 21, "weight_grams": 5, "image_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400", "designer_name": "الدانة حمد الحنزاب", "brand": "DW Jewellery", "stock": 10, "category": "أقراط", "is_active": True},
+    ]
+    await db.products.insert_many(designer_products)
+    logger.info("Designer products seeded")
 
 async def update_gold_prices():
     """Fetch gold prices from free API and convert to QAR"""
