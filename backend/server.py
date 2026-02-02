@@ -677,6 +677,47 @@ async def clear_cart(request: Request):
     await db.carts.delete_one({"user_id": user["user_id"]})
     return {"message": "تم تفريغ السلة"}
 
+# Add custom gold investment to cart
+class GoldInvestmentItem(BaseModel):
+    karat: int
+    grams: float
+    price_per_gram: float
+
+@api_router.post("/cart/add-gold")
+async def add_gold_to_cart(request: Request, item: GoldInvestmentItem):
+    user = await get_current_user(request)
+    
+    # Create a custom product ID for this gold investment
+    custom_product_id = f"gold_{item.karat}k_{item.grams}g_{uuid.uuid4().hex[:8]}"
+    total_price = item.grams * item.price_per_gram
+    
+    cart = await db.carts.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    cart_item = {
+        "product_id": custom_product_id,
+        "quantity": 1,
+        "is_gold_investment": True,
+        "karat": item.karat,
+        "grams": item.grams,
+        "price_per_gram": item.price_per_gram,
+        "total_price": total_price,
+        "title": f"سبيكة ذهب عيار {item.karat} - {item.grams} جرام",
+        "image_url": "https://images.unsplash.com/photo-1624365169364-0640dd10e180?w=400"
+    }
+    
+    if cart:
+        await db.carts.update_one(
+            {"user_id": user["user_id"]},
+            {"$push": {"items": cart_item}}
+        )
+    else:
+        await db.carts.insert_one({
+            "user_id": user["user_id"],
+            "items": [cart_item]
+        })
+    
+    return {"message": "تمت إضافة الذهب للسلة", "item": cart_item}
+
 # ==================== ORDERS ====================
 
 @api_router.post("/orders")
