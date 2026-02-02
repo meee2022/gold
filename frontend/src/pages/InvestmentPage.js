@@ -334,7 +334,7 @@ function InvestmentPage() {
                 <p className="text-[#A1A1AA] text-sm">النقاء: {bar.karat === 24 ? "999.9" : bar.karat}</p>
                 <p className="text-[#D4AF37] font-bold mt-1">{bar.price_qar?.toLocaleString()} ر.ق</p>
               </div>
-              <Button onClick={handleBuy} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center text-sm px-4" data-testid={`buy-bar-${bar.product_id}`}>
+              <Button onClick={() => handleAddBarToCart(bar)} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center text-sm px-4" data-testid={`buy-bar-${bar.product_id}`}>
                 اشترِ الآن
               </Button>
             </div>
