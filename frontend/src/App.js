@@ -11,6 +11,8 @@ import AuthPage, { AuthCallback } from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrdersPage from "./pages/OrdersPage";
 import AdminPage from "./pages/AdminPage";
+import DesignersPage from "./pages/DesignersPage";
+import DesignerDetailPage from "./pages/DesignerDetailPage";
 import "./App.css";
 
 // App Router - handles session_id detection for OAuth
@@ -35,6 +37,8 @@ function AppRouter() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/orders" element={<OrdersPage />} />
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/designers" element={<DesignersPage />} />
+      <Route path="/designers/:designerId" element={<DesignerDetailPage />} />
       <Route path="*" element={<HomePage />} />
     </Routes>
   );
