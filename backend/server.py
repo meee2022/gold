@@ -490,13 +490,20 @@ async def get_wallet(request: Request):
     user = await get_current_user(request)
     wallet = await db.wallets.find_one({"user_id": user["user_id"]}, {"_id": 0})
     if not wallet:
-        wallet = {
+        wallet_doc = {
             "user_id": user["user_id"],
             "gold_grams_total": 0.0,
             "cash_qar": 0.0,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
-        await db.wallets.insert_one(wallet)
+        await db.wallets.insert_one(wallet_doc)
+        # Return a clean copy without _id
+        wallet = {
+            "user_id": user["user_id"],
+            "gold_grams_total": 0.0,
+            "cash_qar": 0.0,
+            "updated_at": wallet_doc["updated_at"]
+        }
     return wallet
 
 @api_router.post("/wallet/buy-gold")
