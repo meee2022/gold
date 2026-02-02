@@ -54,10 +54,11 @@ export const ProductCard = ({ product, onAddToCart }) => {
           <Button
             size="sm"
             onClick={(e) => { e.stopPropagation(); onAddToCart?.(product); }}
-            className="bg-[#D4AF37] hover:bg-[#F4C430] text-black h-8 px-3 rounded-full"
+            className="bg-[#D4AF37] hover:bg-[#F4C430] text-black h-8 px-3 rounded-full flex items-center gap-1"
             data-testid="add-to-cart-btn"
           >
             <Plus size={16} />
+            <span className="text-xs font-bold">أضف</span>
           </Button>
         </div>
       </div>
