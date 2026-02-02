@@ -124,6 +124,7 @@ function CartPage() {
       <div className="px-4 space-y-3">
         {cartItems.map(function(item) {
           const product = item.product || {};
+          const isGoldInvestment = item.is_gold_investment;
           return (
             <div key={item.product_id} className="flex gap-3 p-3 bg-[#121212] border border-[#27272A] rounded-xl" data-testid={"cart-item-" + item.product_id}>
               <img src={product.image_url} alt="" className="w-20 h-20 rounded-lg object-cover" />
@@ -132,6 +133,12 @@ function CartPage() {
                   <div>
                     <h4 className="text-white font-semibold text-sm">{product.title}</h4>
                     <p className="text-[#A1A1AA] text-xs">المورد: {product.merchant_name}</p>
+                    {isGoldInvestment && (
+                      <p className="text-[#D4AF37] text-xs mt-1">عيار {item.karat} - {item.grams} جرام</p>
+                    )}
+                    {product.weight_grams && !isGoldInvestment && (
+                      <p className="text-[#A1A1AA] text-xs">الوزن: {product.weight_grams} جرام</p>
+                    )}
                   </div>
                   <button onClick={function() { removeItem(item.product_id); }} className="p-1">
                     <X size={18} className="text-[#A1A1AA]" />
@@ -139,23 +146,25 @@ function CartPage() {
                 </div>
                 <div className="flex items-center justify-between mt-2">
                   <span className="text-[#D4AF37] font-bold">{(product.price_qar || 0).toLocaleString()} ر.ق</span>
-                  <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full p-1">
-                    <button 
-                      onClick={function() { updateQuantity(item.product_id, item.quantity - 1); }}
-                      className="w-7 h-7 rounded-full bg-[#D4AF37] text-black flex items-center justify-center"
-                      data-testid="decrease-qty"
-                    >
-                      <Minus size={14} />
-                    </button>
-                    <span className="text-white w-6 text-center">{item.quantity}</span>
-                    <button 
-                      onClick={function() { updateQuantity(item.product_id, item.quantity + 1); }}
-                      className="w-7 h-7 rounded-full bg-[#D4AF37] text-black flex items-center justify-center"
-                      data-testid="increase-qty"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
+                  {!isGoldInvestment && (
+                    <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-full p-1">
+                      <button 
+                        onClick={function() { updateQuantity(item.product_id, item.quantity - 1); }}
+                        className="w-7 h-7 rounded-full bg-[#D4AF37] text-black flex items-center justify-center"
+                        data-testid="decrease-qty"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="text-white w-6 text-center">{item.quantity}</span>
+                      <button 
+                        onClick={function() { updateQuantity(item.product_id, item.quantity + 1); }}
+                        className="w-7 h-7 rounded-full bg-[#D4AF37] text-black flex items-center justify-center"
+                        data-testid="increase-qty"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
