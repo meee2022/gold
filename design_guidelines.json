@@ -1,0 +1,127 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer",
+    "mission": "Create a mobile-first, Arabic (RTL) gold trading & marketplace app that exudes luxury, trust, and cultural depth.",
+    "principles": [
+      "Fusion over Imitation: Mix Fintech precision with Jewelry elegance.",
+      "Emotion First: Every screen must feel 'expensive' and 'secure'.",
+      "Content is King: Gold prices and product details must be legible and beautiful.",
+      "Zoom In: High-fidelity product images are the hero.",
+      "Negative Space: Use dark space to make gold pop."
+    ]
+  },
+  "tech_stack": {
+    "framework": "React 19",
+    "styling": "Tailwind CSS",
+    "components": "Shadcn/UI",
+    "icons": "Lucide React",
+    "fonts": "Cairo (Headings), Tajawal (Body)"
+  },
+  "theme": {
+    "mode": "dark",
+    "direction": "rtl",
+    "palette": {
+      "background": {
+        "default": "#050505",
+        "paper": "#121212",
+        "subtle": "#1A1A1A"
+      },
+      "primary": {
+        "main": "#D4AF37",
+        "light": "#F4C430",
+        "dark": "#AA8C2C",
+        "foreground": "#000000"
+      },
+      "secondary": {
+        "main": "#FFFFFF",
+        "muted": "#A1A1AA",
+        "border": "#27272A"
+      },
+      "accent": {
+        "success": "#10B981",
+        "danger": "#EF4444",
+        "warning": "#F59E0B"
+      }
+    },
+    "typography": {
+      "font_family_heading": "'Cairo', sans-serif",
+      "font_family_body": "'Tajawal', sans-serif",
+      "scale": {
+        "h1": "text-3xl font-bold tracking-tight",
+        "h2": "text-2xl font-bold",
+        "h3": "text-xl font-semibold",
+        "body": "text-base font-normal",
+        "caption": "text-sm text-muted-foreground"
+      }
+    },
+    "radius": "0.75rem"
+  },
+  "layout_strategy": {
+    "container": "max-w-md mx-auto min-h-screen bg-background text-foreground overflow-x-hidden",
+    "grid": "grid grid-cols-2 gap-4 p-4",
+    "spacing": {
+      "section": "py-8",
+      "element": "mb-4"
+    },
+    "rtl_rules": [
+      "Ensure 'dir=rtl' is set on the root html tag.",
+      "Use logical properties (ms-*, me-*) instead of left/right where possible, or rely on Tailwind's RTL support.",
+      "Icons must be mirrored if directional (e.g., back arrows)."
+    ]
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-full font-bold shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all",
+      "secondary": "bg-secondary/10 text-secondary hover:bg-secondary/20 rounded-full",
+      "ghost": "hover:bg-accent hover:text-accent-foreground"
+    },
+    "cards": {
+      "product": "bg-[#121212] border border-[#27272A] rounded-xl overflow-hidden hover:border-primary/50 transition-colors group",
+      "stat": "bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] border border-[#27272A] p-4 rounded-xl"
+    },
+    "navigation": {
+      "bottom_bar": "fixed bottom-0 left-0 right-0 bg-[#0A0A0A]/90 backdrop-blur-lg border-t border-[#27272A] h-16 flex items-center justify-around z-50",
+      "top_bar": "sticky top-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#27272A] p-4 flex items-center justify-between"
+    },
+    "inputs": {
+      "default": "bg-[#1A1A1A] border-[#27272A] focus:border-primary focus:ring-primary/20 rounded-lg h-12 text-right placeholder:text-muted-foreground"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_gold": "https://images.unsplash.com/photo-1624365169364-0640dd10e180?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwzfHxnb2xkJTIwYmFycyUyMGNvaW5zJTIwaW52ZXN0bWVudCUyMGx1eHVyeXxlbnwwfHx8fDE3NzAwMzc5MDh8MA&ixlib=rb-4.1.0&q=85",
+      "jewelry_ring": "https://images.unsplash.com/photo-1702721024359-fddf593fef3f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHw0fHxsdXh1cnklMjBnb2xkJTIwamV3ZWxyeSUyMG5lY2tsYWNlJTIwcmluZyUyMGJsYWNrJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3NzAwMzc5MDZ8MA&ixlib=rb-4.1.0&q=85",
+      "jewelry_necklace": "https://images.unsplash.com/photo-1688406264720-e2f9389c9ed1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBnb2xkJTIwamV3ZWxyeSUyMG5lY2tsYWNlJTIwcmluZyUyMGJsYWNrJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3NzAwMzc5MDZ8MA&ixlib=rb-4.1.0&q=85",
+      "doha_skyline": "https://images.unsplash.com/photo-1765046919689-7316a0d13df9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxxYXRhciUyMGRvaGElMjBza3lsaW5lJTIwbHV4dXJ5JTIwbmlnaHR8ZW58MHx8fHwxNzcwMDM3OTEzfDA&ixlib=rb-4.1.0&q=85",
+      "gold_coins": "https://images.unsplash.com/photo-1637597383958-d777c022e241?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHw0fHxnb2xkJTIwYmFycyUyMGNvaW5zJTIwaW52ZXN0bWVudCUyMGx1eHVyeXxlbnwwfHx8fDE3NzAwMzc5MDh8MA&ixlib=rb-4.1.0&q=85"
+    },
+    "icons": {
+      "home": "Home",
+      "jewelry": "Gem",
+      "offers": "Percent",
+      "orders": "Clock",
+      "account": "User",
+      "cart": "ShoppingBag",
+      "search": "Search",
+      "filter": "SlidersHorizontal"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react' and 'clsx' 'tailwind-merge' if not present.",
+    "2. FONTS: Add Google Fonts import for Cairo and Tajawal in index.css.",
+    "3. TAILWIND: Update tailwind.config.js to use the specific color palette defined above. Extend the theme, do not overwrite.",
+    "4. COMPONENTS: Create a 'BottomNav' component that is fixed at the bottom.",
+    "5. PAGES: Implement 'Home', 'Investment', 'Store', 'Cart', 'Profile' pages.",
+    "6. MOCK DATA: Create a 'data.js' file with mock products (rings, necklaces, gold bars) using the provided image URLs.",
+    "7. RTL: Ensure all flex containers have correct direction. Use 'flex-row-reverse' if needed manually, but 'dir=rtl' on body should handle most.",
+    "8. SHADCN: Use Shadcn Card, Button, Input, Badge components. Customize them to match the dark/gold theme.",
+    "9. CHARTS: Use Recharts for the Gold Price history graph (AreaChart with gold gradient)."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop': No generic gradients. Use solid, deep colors with subtle borders.",
+    "Contrast: Ensure text is legible against the dark background. Use White for primary text, Grey-400 for secondary.",
+    "Spacing: Use generous padding inside cards (p-4 or p-6).",
+    "Touch Targets: All interactive elements must be at least 44x44px.",
+    "Data-TestID: Add 'data-testid' to all interactive elements."
+  ]
+}
