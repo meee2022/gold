@@ -606,11 +606,25 @@ async def get_cart(request: Request):
     items_with_products = []
     total = 0
     for item in cart.get("items", []):
-        product = await db.products.find_one({"product_id": item["product_id"]}, {"_id": 0})
-        if product:
-            item["product"] = product
-            total += product["price_qar"] * item["quantity"]
+        # Check if it's a custom gold investment
+        if item.get("is_gold_investment"):
+            item["product"] = {
+                "product_id": item["product_id"],
+                "title": item["title"],
+                "price_qar": item["total_price"],
+                "image_url": item["image_url"],
+                "karat": item["karat"],
+                "weight_grams": item["grams"],
+                "merchant_name": "زينة وخزينة - استثمار"
+            }
+            total += item["total_price"]
             items_with_products.append(item)
+        else:
+            product = await db.products.find_one({"product_id": item["product_id"]}, {"_id": 0})
+            if product:
+                item["product"] = product
+                total += product["price_qar"] * item["quantity"]
+                items_with_products.append(item)
     
     return {"items": items_with_products, "total": total}
 
