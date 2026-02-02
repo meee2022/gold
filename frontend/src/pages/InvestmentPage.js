@@ -55,7 +55,7 @@ function InvestmentPage() {
     setLoading(false);
   };
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     if (!user) {
       navigate("/auth");
       return;
@@ -64,7 +64,40 @@ function InvestmentPage() {
       navigate("/sharia");
       return;
     }
-    toast.success(`تم طلب شراء ${quantity} جرام من عيار ${selectedKarat}`);
+    
+    try {
+      await apiCall("post", "/cart/add-gold", {
+        karat: selectedKarat,
+        grams: quantity,
+        price_per_gram: selectedPrice
+      });
+      toast.success(`تمت إضافة ${quantity} جرام من عيار ${selectedKarat} للسلة`);
+      // Navigate to cart
+      navigate("/cart");
+    } catch (error) {
+      toast.error("فشل في إضافة الذهب للسلة");
+    }
+  };
+
+  const handleAddBarToCart = async (bar) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    if (!shariaAccepted) {
+      navigate("/sharia");
+      return;
+    }
+    
+    try {
+      await apiCall("post", "/cart/add", {
+        product_id: bar.product_id,
+        quantity: 1
+      });
+      toast.success(`تمت إضافة ${bar.title} للسلة`);
+    } catch (error) {
+      toast.error("فشل في إضافة المنتج للسلة");
+    }
   };
 
   // Get price for selected karat
