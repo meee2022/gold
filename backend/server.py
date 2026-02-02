@@ -227,6 +227,11 @@ async def startup_event():
     merchants_count = await db.merchants.count_documents({})
     if merchants_count == 0:
         await seed_sample_merchants()
+    
+    # Seed designers if empty
+    designers_count = await db.designers.count_documents({})
+    if designers_count == 0:
+        await seed_qatari_designers()
 
 async def seed_sample_merchants():
     merchants = [
@@ -237,6 +242,27 @@ async def seed_sample_merchants():
     ]
     await db.merchants.insert_many(merchants)
     logger.info("Sample merchants seeded")
+
+async def seed_qatari_designers():
+    designers = [
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "أسماء السعدي", "brand": "Clair De Lune / كلير دي لون", "logo_url": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=100&h=100&fit=crop", "specialty": "تصاميم عصرية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "فاطمة المهندي", "brand": "De Trove / دي تروف", "logo_url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=100&h=100&fit=crop", "specialty": "تصاميم فاخرة", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "حصة وجواهر المناعي", "brand": "Ghand Jewellery / مجوهرات غند", "logo_url": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=100&h=100&fit=crop", "specialty": "تصاميم تراثية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "حمد المحمد", "brand": "H Jewellery / مجوهرات H", "logo_url": "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=100&h=100&fit=crop", "specialty": "تصاميم رجالية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "سميرة الملا", "brand": "Hessa Jewels / مجوهرات حصة", "logo_url": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop", "specialty": "تصاميم كلاسيكية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "ليلى أبو عيسى", "brand": "Layla Issam Jewellery / مجوهرات ليلى عصام", "logo_url": "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=100&h=100&fit=crop", "specialty": "تصاميم عصرية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "عبد الله يوسف فخرو", "brand": "Midad Jewellery / مجوهرات مداد", "logo_url": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=100&h=100&fit=crop", "specialty": "تصاميم خط عربي", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "نوف المير", "brand": "Nouf Jewellery / مجوهرات نوف", "logo_url": "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=100&h=100&fit=crop", "specialty": "تصاميم ناعمة", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "فجر العطية", "brand": "Trifoglio Jewellery / مجوهرات تريفوجليو", "logo_url": "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=100&h=100&fit=crop", "specialty": "تصاميم إيطالية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "مريم ونورة المعضادي", "brand": "Thameen / مجوهرات ثمين", "logo_url": "https://images.unsplash.com/photo-1627656688426-927a5d6c1a1e?w=100&h=100&fit=crop", "specialty": "تصاميم راقية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "شيخة الغانم", "brand": "Al Ghara Jewellery / مجوهرات الغلا", "logo_url": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=100&h=100&fit=crop", "specialty": "تصاميم خليجية", "is_active": True},
+        {"designer_id": f"designer_{uuid.uuid4().hex[:8]}", "name": "الدانة حمد الحنزاب", "brand": "DW Jewellery", "logo_url": "https://images.unsplash.com/photo-1610375461246-83df859d849d?w=100&h=100&fit=crop", "specialty": "تصاميم حديثة", "is_active": True},
+    ]
+    await db.designers.insert_many(designers)
+    logger.info("Qatari designers seeded")
+    
+    # Seed designer products
+    await seed_designer_products()
 
 async def seed_sample_products():
     products = [
