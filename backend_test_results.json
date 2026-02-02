@@ -1,0 +1,190 @@
+{
+  "summary": {
+    "tests_run": 30,
+    "tests_passed": 29,
+    "success_rate": 96.66666666666667
+  },
+  "results": [
+    {
+      "test": "API Root",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.620052"
+    },
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.664283"
+    },
+    {
+      "test": "Get Gold Prices",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.704353"
+    },
+    {
+      "test": "Gold Prices Structure",
+      "success": true,
+      "details": "Fields present: ['karat', 'price_per_gram_qar', 'change_amount', 'change_percent', 'updated_at']",
+      "timestamp": "2026-02-02T13:36:25.704989"
+    },
+    {
+      "test": "Get All Products",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.761205"
+    },
+    {
+      "test": "Get Jewelry Products",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.802551"
+    },
+    {
+      "test": "Get Investment Products",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.844920"
+    },
+    {
+      "test": "Get Gift Products",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.892300"
+    },
+    {
+      "test": "Get Qatari Products",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.928405"
+    },
+    {
+      "test": "Get Specific Product",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:25.969603"
+    },
+    {
+      "test": "Get Non-existent Product",
+      "success": true,
+      "details": "Status: 404",
+      "timestamp": "2026-02-02T13:36:26.009108"
+    },
+    {
+      "test": "Get Merchants",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.047323"
+    },
+    {
+      "test": "Merchants Structure",
+      "success": true,
+      "details": "Fields present: ['merchant_id', 'name', 'logo_url', 'is_active']",
+      "timestamp": "2026-02-02T13:36:26.047995"
+    },
+    {
+      "test": "Admin Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.314417"
+    },
+    {
+      "test": "Admin Token Received",
+      "success": true,
+      "details": "Token obtained successfully",
+      "timestamp": "2026-02-02T13:36:26.315124"
+    },
+    {
+      "test": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.354177"
+    },
+    {
+      "test": "Invalid Login",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2026-02-02T13:36:26.391133"
+    },
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.714630"
+    },
+    {
+      "test": "Get Wallet",
+      "success": false,
+      "details": "Status: 520, Expected: 200, Response: Internal Server Error",
+      "timestamp": "2026-02-02T13:36:26.752032"
+    },
+    {
+      "test": "Get Cart",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.789298"
+    },
+    {
+      "test": "Get Transactions",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.826121"
+    },
+    {
+      "test": "Get Sharia Acceptance",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.866270"
+    },
+    {
+      "test": "Admin Stats",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.946605"
+    },
+    {
+      "test": "Admin Get Orders",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:26.983996"
+    },
+    {
+      "test": "Admin Get Users",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.019136"
+    },
+    {
+      "test": "Get Products for Cart",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.055153"
+    },
+    {
+      "test": "Add to Cart",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.115777"
+    },
+    {
+      "test": "Get Cart After Add",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.153190"
+    },
+    {
+      "test": "Update Cart Item",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.190381"
+    },
+    {
+      "test": "Remove from Cart",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-02T13:36:27.227480"
+    }
+  ],
+  "timestamp": "2026-02-02T13:36:27.228365"
+}
