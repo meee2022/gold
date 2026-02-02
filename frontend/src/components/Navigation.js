@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, TrendingUp, Gift, Store, User, ShoppingCart, Bell, ChevronLeft } from "lucide-react";
+import { Home, TrendingUp, Gift, Store, User, ShoppingCart, ShoppingBag, Bell, ChevronLeft } from "lucide-react";
 import { useAuth, apiCall } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 
