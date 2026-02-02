@@ -539,6 +539,13 @@ async def get_merchants():
     merchants = await db.merchants.find({"is_active": True}, {"_id": 0}).to_list(50)
     return merchants
 
+# ==================== DESIGNERS ====================
+
+@api_router.get("/designers")
+async def get_designers():
+    designers = await db.designers.find({"is_active": True}, {"_id": 0}).to_list(50)
+    return designers
+
 # ==================== WALLET ====================
 
 @api_router.get("/wallet")
