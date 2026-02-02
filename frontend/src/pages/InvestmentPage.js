@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, Calculator, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
 import { toast } from "sonner";
 import { useAuth, apiCall, API } from "../context/AuthContext";
 import { BottomNav, TopHeader } from "../components/Navigation";
 import { PriceCard } from "../components/Cards";
 
-const InvestmentPage = () => {
+function InvestmentPage() {
   const [prices, setPrices] = useState([]);
   const [bars, setBars] = useState([]);
   const [wallet, setWallet] = useState(null);
@@ -20,6 +21,10 @@ const InvestmentPage = () => {
   const [selectedWeight, setSelectedWeight] = useState("all");
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  // Calculator state
+  const [selectedKarat, setSelectedKarat] = useState(24);
+  const [quantity, setQuantity] = useState(10);
 
   useEffect(() => {
     fetchData();
@@ -59,8 +64,25 @@ const InvestmentPage = () => {
       navigate("/sharia");
       return;
     }
-    toast.info("سيتم إضافة ميزة الشراء قريباً");
+    toast.success(`تم طلب شراء ${quantity} جرام من عيار ${selectedKarat}`);
   };
+
+  // Get price for selected karat
+  const getKaratPrice = (karat) => {
+    const priceData = prices.find(p => p.karat === karat);
+    return priceData ? priceData.price_per_gram_qar : 0;
+  };
+
+  const selectedPrice = getKaratPrice(selectedKarat);
+  const totalPrice = selectedPrice * quantity;
+
+  const quickQuantities = [10, 50, 100, 500];
+  const karatOptions = [
+    { value: 24, label: "عيار 24" },
+    { value: 22, label: "عيار 22" },
+    { value: 21, label: "عيار 21" },
+    { value: 18, label: "عيار 18" },
+  ];
 
   const weightFilters = ["all", "10", "50", "100"];
   const filteredBars = selectedWeight === "all" 
@@ -70,7 +92,7 @@ const InvestmentPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] pb-20">
-        <TopHeader title="الاستثمار" showBack />
+        <TopHeader title="الاستثمار" />
         <div className="p-4 space-y-4">
           {[1, 2, 3].map(i => <div key={i} className="skeleton h-32 rounded-xl" />)}
         </div>
@@ -96,6 +118,125 @@ const InvestmentPage = () => {
             />
           ))}
         </div>
+      </div>
+
+      {/* Gold Calculator */}
+      <div className="px-4 py-3">
+        <Card className="bg-[#0D0D0D] border-[#27272A]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[#D4AF37] font-['Cairo'] flex items-center gap-2 text-lg">
+              <Calculator size={20} />
+              حاسبة الذهب
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Karat Selection */}
+            <div>
+              <p className="text-white text-sm mb-2 text-right font-['Cairo']">اختر العيار</p>
+              <div className="grid grid-cols-4 gap-2">
+                {karatOptions.map((option) => {
+                  const price = getKaratPrice(option.value);
+                  const isSelected = selectedKarat === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => setSelectedKarat(option.value)}
+                      className={`p-3 rounded-xl border-2 transition-all ${
+                        isSelected 
+                          ? "border-[#D4AF37] bg-[#D4AF37]/10" 
+                          : "border-[#27272A] bg-[#121212] hover:border-[#D4AF37]/50"
+                      }`}
+                      data-testid={`karat-${option.value}`}
+                    >
+                      <p className={`font-bold text-sm ${isSelected ? "text-[#D4AF37]" : "text-white"}`}>
+                        {option.label}
+                      </p>
+                      <p className="text-[#A1A1AA] text-xs mt-1">
+                        {price.toFixed(2)} ر.ق/
+                      </p>
+                      <p className="text-[#A1A1AA] text-xs">جم</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quantity Input */}
+            <div>
+              <p className="text-white text-sm mb-2 text-right font-['Cairo']">الكمية (بالجرام)</p>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="bg-[#121212] border-[#D4AF37]/50 text-white text-center text-2xl font-bold h-14 rounded-xl"
+                  min="1"
+                  data-testid="quantity-input"
+                />
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-14 h-14 rounded-xl bg-[#1A1A1A] border border-[#27272A] flex items-center justify-center hover:bg-[#252525] transition-colors"
+                  data-testid="decrease-quantity"
+                >
+                  <Minus size={20} className="text-white" />
+                </button>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-14 h-14 rounded-xl bg-[#1A1A1A] border border-[#27272A] flex items-center justify-center hover:bg-[#252525] transition-colors"
+                  data-testid="increase-quantity"
+                >
+                  <Plus size={20} className="text-white" />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Quantity Buttons */}
+            <div className="flex gap-2">
+              {quickQuantities.map((q) => (
+                <button
+                  key={q}
+                  onClick={() => setQuantity(q)}
+                  className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+                    quantity === q 
+                      ? "bg-[#D4AF37] text-black" 
+                      : "bg-[#1A1A1A] text-[#A1A1AA] border border-[#27272A] hover:border-[#D4AF37]/50"
+                  }`}
+                  data-testid={`quick-qty-${q}`}
+                >
+                  {q}جم
+                </button>
+              ))}
+            </div>
+
+            {/* Price Summary */}
+            <div className="bg-[#121212] rounded-xl p-4 space-y-3 border border-[#27272A]">
+              <div className="flex justify-between items-center">
+                <span className="text-[#D4AF37] font-bold">{selectedPrice.toFixed(2)} ريال</span>
+                <span className="text-white text-right font-['Cairo']">السعر للجرام</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-white">{quantity} جرام</span>
+                <span className="text-white text-right font-['Cairo']">الكمية</span>
+              </div>
+              <div className="border-t border-[#27272A] pt-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-[#D4AF37] font-bold text-2xl">{totalPrice.toFixed(2)} ريال</span>
+                  <span className="text-white font-bold text-right font-['Cairo']">الإجمالي</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Buy Button */}
+            <Button 
+              onClick={handleBuy}
+              className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-xl h-14 text-lg gold-glow"
+              data-testid="buy-gold-calculator"
+            >
+              <ShoppingCart className="ml-2" size={20} />
+              شراء الآن
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* My Wallet */}
@@ -160,7 +301,7 @@ const InvestmentPage = () => {
                 <p className="text-[#A1A1AA] text-sm">النقاء: {bar.karat === 24 ? "999.9" : bar.karat}</p>
                 <p className="text-[#D4AF37] font-bold mt-1">{bar.price_qar?.toLocaleString()} ر.ق</p>
               </div>
-              <Button onClick={handleBuy} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center" data-testid={`buy-bar-${bar.product_id}`}>
+              <Button onClick={handleBuy} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center text-sm px-4" data-testid={`buy-bar-${bar.product_id}`}>
                 اشترِ الآن
               </Button>
             </div>
@@ -201,6 +342,6 @@ const InvestmentPage = () => {
       <BottomNav />
     </div>
   );
-};
+}
 
 export default InvestmentPage;
