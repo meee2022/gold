@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { toast } from "sonner";
 import { useAuth, API } from "../context/AuthContext";
 
 const AuthPage = () => {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // login, register, forgot, reset
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login, register, loginWithGoogle, user } = useAuth();
@@ -28,34 +30,140 @@ const AuthPage = () => {
     try {
       if (mode === "login") {
         await login(email, password);
-      } else {
+        toast.success("تم تسجيل الدخول بنجاح");
+        navigate("/");
+      } else if (mode === "register") {
         await register(name, email, password);
+        toast.success("تم إنشاء الحساب بنجاح");
+        navigate("/");
+      } else if (mode === "forgot") {
+        const response = await axios.post(`${API}/auth/forgot-password`, { email });
+        toast.success("تم إرسال رمز إعادة التعيين");
+        // If debug_token is returned (no email configured), show it
+        if (response.data.debug_token) {
+          setResetToken(response.data.debug_token.substring(0, 8));
+          toast.info(`رمز إعادة التعيين: ${response.data.debug_token.substring(0, 8)}`);
+        }
+        setMode("reset");
+      } else if (mode === "reset") {
+        await axios.post(`${API}/auth/reset-password`, {
+          token: resetToken,
+          new_password: newPassword
+        });
+        toast.success("تم تغيير كلمة المرور بنجاح");
+        setMode("login");
+        setResetToken("");
+        setNewPassword("");
       }
-      toast.success(mode === "login" ? "تم تسجيل الدخول بنجاح" : "تم إنشاء الحساب بنجاح");
-      navigate("/");
     } catch (error) {
       toast.error(error.response?.data?.detail || "حدث خطأ");
     }
     setLoading(false);
   };
 
-  return (
-    <div className="min-h-screen bg-[#050505] flex flex-col" data-testid="auth-page">
-      {/* Header */}
-      <div className="p-4">
-        <button onClick={() => navigate("/")} className="p-2">
-          <ChevronLeft size={24} className="text-[#D4AF37] flip-rtl" />
-        </button>
-      </div>
+  const renderForm = () => {
+    if (mode === "forgot") {
+      return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-white font-['Cairo']">نسيت كلمة المرور؟</h2>
+            <p className="text-[#A1A1AA] text-sm mt-2">أدخل بريدك الإلكتروني لإرسال رمز إعادة التعيين</p>
+          </div>
+          
+          <div>
+            <label className="text-white text-sm mb-2 block">البريد الإلكتروني</label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              required
+              className="bg-[#1A1A1A] border-[#27272A] text-white h-12 rounded-xl"
+              data-testid="forgot-email-input"
+            />
+          </div>
 
-      {/* Content */}
-      <div className="flex-1 px-6 py-8">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#D4AF37] font-['Cairo']">زينة وخزينة</h1>
-          <p className="text-[#A1A1AA] text-sm mt-2">ZEINA & KHAZINA</p>
-        </div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full h-12 gold-glow"
+            data-testid="send-reset-btn"
+          >
+            {loading ? "جاري الإرسال..." : "إرسال رمز إعادة التعيين"}
+          </Button>
 
+          <button
+            type="button"
+            onClick={() => setMode("login")}
+            className="w-full text-[#D4AF37] text-sm flex items-center justify-center gap-2"
+          >
+            <ArrowRight size={16} className="flip-rtl" />
+            العودة لتسجيل الدخول
+          </button>
+        </form>
+      );
+    }
+
+    if (mode === "reset") {
+      return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-bold text-white font-['Cairo']">إعادة تعيين كلمة المرور</h2>
+            <p className="text-[#A1A1AA] text-sm mt-2">أدخل الرمز المرسل وكلمة المرور الجديدة</p>
+          </div>
+
+          <div>
+            <label className="text-white text-sm mb-2 block">رمز إعادة التعيين</label>
+            <Input
+              type="text"
+              value={resetToken}
+              onChange={(e) => setResetToken(e.target.value)}
+              placeholder="أدخل الرمز (8 أحرف)"
+              required
+              maxLength={8}
+              className="bg-[#1A1A1A] border-[#27272A] text-white h-12 rounded-xl text-center tracking-widest font-mono"
+              data-testid="reset-token-input"
+            />
+          </div>
+
+          <div>
+            <label className="text-white text-sm mb-2 block">كلمة المرور الجديدة</label>
+            <Input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={6}
+              className="bg-[#1A1A1A] border-[#27272A] text-white h-12 rounded-xl"
+              data-testid="new-password-input"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full h-12 gold-glow"
+            data-testid="reset-password-btn"
+          >
+            {loading ? "جاري التغيير..." : "تغيير كلمة المرور"}
+          </Button>
+
+          <button
+            type="button"
+            onClick={() => setMode("login")}
+            className="w-full text-[#D4AF37] text-sm flex items-center justify-center gap-2"
+          >
+            <ArrowRight size={16} className="flip-rtl" />
+            العودة لتسجيل الدخول
+          </button>
+        </form>
+      );
+    }
+
+    // Login or Register form
+    return (
+      <>
         {/* Google Login */}
         <Button
           onClick={loginWithGoogle}
@@ -109,7 +217,19 @@ const AuthPage = () => {
           </div>
 
           <div>
-            <label className="text-white text-sm mb-2 block">كلمة المرور</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-white text-sm">كلمة المرور</label>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="text-[#D4AF37] text-sm hover:underline"
+                  data-testid="forgot-password-link"
+                >
+                  نسيت كلمة المرور؟
+                </button>
+              )}
+            </div>
             <Input
               type="password"
               value={password}
@@ -142,6 +262,28 @@ const AuthPage = () => {
             {mode === "login" ? "إنشاء حساب" : "تسجيل الدخول"}
           </button>
         </p>
+      </>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050505] flex flex-col" data-testid="auth-page">
+      {/* Header */}
+      <div className="p-4">
+        <button onClick={() => navigate("/")} className="p-2">
+          <ChevronLeft size={24} className="text-[#D4AF37] flip-rtl" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-6 py-8">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-[#D4AF37] font-['Cairo']">زينة وخزينة</h1>
+          <p className="text-[#A1A1AA] text-sm mt-2">ZEINA & KHAZINA</p>
+        </div>
+
+        {renderForm()}
       </div>
     </div>
   );
