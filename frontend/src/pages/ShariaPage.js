@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { Checkbox } from "../components/ui/checkbox";
 import { toast } from "sonner";
 import { useAuth, apiCall } from "../context/AuthContext";
+import { BottomNav } from "../components/Navigation";
 
 const ShariaPage = () => {
   const [accepted, setAccepted] = useState(false);
@@ -60,40 +61,40 @@ const ShariaPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFBF0] pb-20" data-testid="sharia-page">
+    <div className="min-h-screen bg-[#050505] pb-24" data-testid="sharia-page">
       {/* Header */}
-      <div className="bg-white px-4 py-3 flex items-center gap-3 border-b border-[#E5E5E5]">
+      <div className="bg-[#0A0A0A] px-4 py-3 flex items-center gap-3 border-b border-[#27272A]">
         <button onClick={() => navigate(-1)} className="p-2">
-          <ChevronLeft size={24} className="text-[#0A0A0A] flip-rtl" />
+          <ChevronLeft size={24} className="text-[#D4AF37] flip-rtl" />
         </button>
-        <h1 className="text-[#0A0A0A] font-bold font-['Cairo'] flex-1 text-right">اتفاقية التقابض والشروط الشرعية</h1>
+        <h1 className="text-[#D4AF37] font-bold font-['Cairo'] flex-1 text-right">اتفاقية التقابض والشروط الشرعية</h1>
       </div>
 
       <div className="p-4">
         {/* Icon */}
         <div className="flex justify-center py-6">
-          <div className="w-20 h-20 rounded-full bg-[#D4AF37]/20 flex items-center justify-center">
+          <div className="w-20 h-20 rounded-full bg-[#D4AF37]/20 flex items-center justify-center border border-[#D4AF37]/30">
             <Check size={40} className="text-[#D4AF37]" />
           </div>
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-[#0A0A0A] text-center font-['Cairo'] mb-2">
+        <h2 className="text-2xl font-bold text-[#D4AF37] text-center font-['Cairo'] mb-2">
           الالتزام بالشريعة الإسلامية
         </h2>
-        <p className="text-[#666] text-center text-sm mb-6 px-2">
+        <p className="text-[#A1A1AA] text-center text-sm mb-6 px-2">
           تتم جميع المعاملات في "زينة وخزينة" وفقاً للضوابط الشرعية المعتمدة لتجارة الذهب والمجوهرات لضمان خلوها من الربا والغرر.
         </p>
 
         {/* Terms Cards */}
         <div className="space-y-3 mb-6">
           {terms.map((term, index) => (
-            <div key={index} className="bg-white border border-[#E5E5E5] rounded-xl p-4 flex gap-4">
+            <div key={index} className="bg-[#121212] border border-[#27272A] rounded-xl p-4 flex gap-4 hover:border-[#D4AF37]/30 transition-colors">
               <div className="flex-1 text-right">
-                <h3 className="font-bold text-[#0A0A0A] font-['Cairo'] mb-1">{term.title}</h3>
-                <p className="text-[#666] text-sm leading-relaxed">{term.description}</p>
+                <h3 className="font-bold text-white font-['Cairo'] mb-1">{term.title}</h3>
+                <p className="text-[#A1A1AA] text-sm leading-relaxed">{term.description}</p>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center flex-shrink-0 border border-[#D4AF37]/20">
                 <term.icon className="text-[#D4AF37]" size={24} />
               </div>
             </div>
@@ -101,15 +102,15 @@ const ShariaPage = () => {
         </div>
 
         {/* Agreement Checkbox */}
-        <div className="flex items-center gap-3 mb-4 p-4 bg-white rounded-xl border border-[#E5E5E5]">
-          <label htmlFor="sharia-accept" className="text-[#0A0A0A] text-sm cursor-pointer flex-1 text-right">
+        <div className="flex items-center gap-3 mb-4 p-4 bg-[#121212] rounded-xl border border-[#27272A]">
+          <label htmlFor="sharia-accept" className="text-white text-sm cursor-pointer flex-1 text-right">
             لقد قرأت الشروط الشرعية وأوافق على ما ورد فيها
           </label>
           <Checkbox
             id="sharia-accept"
             checked={accepted}
             onCheckedChange={setAccepted}
-            className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37]"
+            className="data-[state=checked]:bg-[#D4AF37] data-[state=checked]:border-[#D4AF37] border-[#D4AF37]"
             data-testid="sharia-checkbox"
           />
         </div>
@@ -118,21 +119,23 @@ const ShariaPage = () => {
         <Button
           onClick={handleAccept}
           disabled={loading || !accepted}
-          className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full h-12 disabled:opacity-50"
+          className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full h-12 disabled:opacity-50 gold-glow"
           data-testid="accept-sharia-btn"
         >
           {loading ? "جاري الحفظ..." : "موافق والاستمرار"}
         </Button>
 
         {/* Additional Terms */}
-        <div className="mt-6 space-y-3 text-[#666] text-sm bg-white rounded-xl p-4 border border-[#E5E5E5]">
+        <div className="mt-6 space-y-3 text-[#A1A1AA] text-sm bg-[#121212] rounded-xl p-4 border border-[#27272A]">
           {additionalTerms.map((term, index) => (
             <p key={index} className="text-right leading-relaxed">
-              {index + 1}. {term}
+              <span className="text-[#D4AF37] font-bold">{index + 1}.</span> {term}
             </p>
           ))}
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 };
