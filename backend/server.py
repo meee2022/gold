@@ -355,7 +355,7 @@ async def update_gold_prices():
     """Fetch gold prices from free API and convert to QAR"""
     global last_gold_prices
     
-    usd_per_oz = 2950  # Default fallback (current market rate approximately)
+    usd_per_oz = 4950  # Default fallback (current market rate approximately)
     
     try:
         # Use goldprice.org free API with browser-like headers
@@ -368,15 +368,12 @@ async def update_gold_prices():
             response = await http_client.get("https://data-asg.goldprice.org/dbXRates/USD")
             if response.status_code == 200:
                 data = response.json()
-                # API returns xauPrice which needs adjustment
-                # Based on analysis, xauPrice / 10 * 6 gives approximate market rate
+                # API returns xauPrice which is USD per troy ounce
                 xau_raw = float(data.get('items', [{}])[0].get('xauPrice', 0))
                 if xau_raw > 0:
-                    # The API returns a scaled value - adjust to get actual USD/oz
-                    # Current gold ~$2900-3100/oz, API returns ~4900-5100
-                    # Ratio is approximately 0.6
-                    usd_per_oz = xau_raw * 0.6
-                    logger.info(f"Fetched LIVE gold price: ${usd_per_oz:.2f}/oz (raw: {xau_raw})")
+                    # xauPrice is already the correct USD per troy ounce
+                    usd_per_oz = xau_raw
+                    logger.info(f"Fetched LIVE gold price: ${usd_per_oz:.2f}/oz")
             else:
                 logger.warning(f"Gold API returned {response.status_code}, using fallback")
     except Exception as e:
