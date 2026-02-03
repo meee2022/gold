@@ -355,21 +355,33 @@ async def update_gold_prices():
     """Fetch gold prices from free API and convert to QAR"""
     global last_gold_prices
     
+    usd_per_oz = 2380  # Default fallback
+    
     try:
-        # Using metals.live free API
-        async with httpx.AsyncClient() as http_client:
+        # Try metals.live API with SSL verification disabled (for environments with SSL issues)
+        async with httpx.AsyncClient(verify=False) as http_client:
             response = await http_client.get("https://api.metals.live/v1/spot/gold", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                # Get USD price per ounce
                 usd_per_oz = float(data[0].get('price', 2380)) if isinstance(data, list) else 2380
-                logger.info(f"Fetched gold price: ${usd_per_oz}/oz")
-            else:
-                logger.warning(f"Metals API returned {response.status_code}, using fallback")
-                usd_per_oz = 2380
+                logger.info(f"Fetched gold price from metals.live: ${usd_per_oz}/oz")
     except Exception as e:
-        logger.error(f"Error fetching gold price: {e}")
-        usd_per_oz = 2380
+        logger.warning(f"Metals.live failed: {e}, trying goldapi.io...")
+        
+        # Fallback to goldapi.io free tier
+        try:
+            async with httpx.AsyncClient(verify=False) as http_client:
+                response = await http_client.get(
+                    "https://www.goldapi.io/api/XAU/USD",
+                    headers={"x-access-token": "goldapi-demo"},
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    usd_per_oz = float(data.get('price', 2380))
+                    logger.info(f"Fetched gold price from goldapi: ${usd_per_oz}/oz")
+        except Exception as e2:
+            logger.error(f"All gold APIs failed: {e2}, using fallback price")
     
     # Convert to QAR (1 USD = 3.64 QAR)
     qar_per_oz = usd_per_oz * 3.64
