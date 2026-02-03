@@ -349,40 +349,116 @@ async def seed_designer_products():
 
 async def update_gold_prices():
     """Fetch gold prices from free API and convert to QAR"""
+    global last_gold_prices
+    
     try:
         # Using metals.live free API
-        async with httpx.AsyncClient() as client:
-            response = await client.get("https://api.metals.live/v1/spot/gold", timeout=10)
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.get("https://api.metals.live/v1/spot/gold", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 # Get USD price per ounce
                 usd_per_oz = float(data[0].get('price', 2380)) if isinstance(data, list) else 2380
+                logger.info(f"Fetched gold price: ${usd_per_oz}/oz")
             else:
-                usd_per_oz = 2380  # Fallback price
+                logger.warning(f"Metals API returned {response.status_code}, using fallback")
+                usd_per_oz = 2380
     except Exception as e:
         logger.error(f"Error fetching gold price: {e}")
-        usd_per_oz = 2380  # Fallback price
+        usd_per_oz = 2380
     
     # Convert to QAR (1 USD = 3.64 QAR)
     qar_per_oz = usd_per_oz * 3.64
     # Convert to grams (1 oz = 31.1035 grams)
     qar_per_gram_24k = qar_per_oz / 31.1035
     
-    # Calculate different karats
-    prices = [
-        {"karat": 24, "price_per_gram_qar": round(qar_per_gram_24k, 2), "change_amount": 3.75, "change_percent": 1.2},
-        {"karat": 22, "price_per_gram_qar": round(qar_per_gram_24k * 22/24, 2), "change_amount": 2.30, "change_percent": 0.8},
-        {"karat": 21, "price_per_gram_qar": round(qar_per_gram_24k * 21/24, 2), "change_amount": 2.10, "change_percent": 0.8},
-        {"karat": 18, "price_per_gram_qar": round(qar_per_gram_24k * 18/24, 2), "change_amount": 1.50, "change_percent": 0.7},
-    ]
+    # Get previous prices to calculate change
+    old_prices = await db.gold_prices.find({}, {"_id": 0}).to_list(10)
+    old_price_map = {p["karat"]: p["price_per_gram_qar"] for p in old_prices}
     
+    # Calculate different karats with real change
+    prices = []
+    karat_multipliers = {24: 1, 22: 22/24, 21: 21/24, 18: 18/24}
+    
+    for karat, multiplier in karat_multipliers.items():
+        new_price = round(qar_per_gram_24k * multiplier, 2)
+        old_price = old_price_map.get(karat, new_price)
+        change_amount = round(new_price - old_price, 2)
+        change_percent = round((change_amount / old_price) * 100, 2) if old_price > 0 else 0
+        
+        prices.append({
+            "karat": karat,
+            "price_per_gram_qar": new_price,
+            "change_amount": change_amount,
+            "change_percent": change_percent,
+            "usd_per_oz": usd_per_oz
+        })
+    
+    # Update database and track changes
+    price_changed = False
     for price in prices:
+        old_p = old_price_map.get(price["karat"], 0)
+        if abs(price["price_per_gram_qar"] - old_p) > 0.01:
+            price_changed = True
+        
         await db.gold_prices.update_one(
             {"karat": price["karat"]},
             {"$set": {**price, "updated_at": datetime.now(timezone.utc).isoformat()}},
             upsert=True
         )
-    logger.info("Gold prices updated")
+    
+    # Store for notifications
+    last_gold_prices = {p["karat"]: p["price_per_gram_qar"] for p in prices}
+    
+    # Check price alerts if price changed
+    if price_changed:
+        await check_price_alerts(prices)
+    
+    logger.info(f"Gold prices updated - 24K: {prices[0]['price_per_gram_qar']} QAR/g")
+    return prices
+
+async def check_price_alerts(current_prices):
+    """Check and trigger price alerts"""
+    price_map = {p["karat"]: p["price_per_gram_qar"] for p in current_prices}
+    
+    alerts = await db.price_alerts.find({"triggered": False}, {"_id": 0}).to_list(100)
+    
+    for alert in alerts:
+        current_price = price_map.get(alert["karat"], 0)
+        should_trigger = False
+        
+        if alert["alert_type"] == "above" and current_price >= alert["target_price"]:
+            should_trigger = True
+        elif alert["alert_type"] == "below" and current_price <= alert["target_price"]:
+            should_trigger = True
+        
+        if should_trigger:
+            await db.price_alerts.update_one(
+                {"alert_id": alert["alert_id"]},
+                {"$set": {"triggered": True, "triggered_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            
+            # Create notification
+            notification = {
+                "notification_id": f"notif_{uuid.uuid4().hex[:12]}",
+                "user_id": alert["user_id"],
+                "type": "price_alert",
+                "title": "تنبيه سعر الذهب",
+                "message": f"وصل سعر الذهب عيار {alert['karat']} إلى {current_price} ر.ق",
+                "read": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.notifications.insert_one(notification)
+            logger.info(f"Price alert triggered for user {alert['user_id']}")
+
+async def periodic_price_update():
+    """Background task to update prices every 5 minutes"""
+    while True:
+        try:
+            await update_gold_prices()
+        except Exception as e:
+            logger.error(f"Periodic price update failed: {e}")
+        await asyncio.sleep(300)  # 5 minutes
 
 # ==================== AUTH ROUTES ====================
 
