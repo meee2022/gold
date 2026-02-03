@@ -22,7 +22,7 @@ export const BottomNav = () => {
     { path: "/", icon: Home, label: "الرئيسية" },
     { path: "/investment", icon: TrendingUp, label: "الاستثمار" },
     { path: "/gifts", icon: Gift, label: "الهدايا" },
-    { path: "/store", icon: Store, label: "المتجر" },
+    { path: "/store", icon: Store, label: "المجوهرات" },
     { path: "/designers", icon: Palette, label: "المصممات" },
   ];
 

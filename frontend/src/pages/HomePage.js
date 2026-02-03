@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { TrendingUp, Gift, Gem } from "lucide-react";
+import { TrendingUp, Gift, Gem, Palette } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { toast } from "sonner";
 import { useAuth, apiCall, API } from "../context/AuthContext";
@@ -50,6 +50,7 @@ const HomePage = () => {
     { label: "الاستثمار", sublabel: "سبائك وعملات", icon: TrendingUp, path: "/investment" },
     { label: "المجوهرات", sublabel: "أطقم فاخرة", icon: Gem, path: "/store" },
     { label: "الهدايا", sublabel: "هدايا ذهبية", icon: Gift, path: "/gifts" },
+    { label: "المصممات", sublabel: "تصاميم قطرية", icon: Palette, path: "/designers" },
   ];
 
   if (loading) {
