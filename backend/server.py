@@ -161,6 +161,18 @@ class MerchantResponse(BaseModel):
     description: Optional[str] = None
     is_active: bool = True
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str
+
+class PriceAlert(BaseModel):
+    karat: int
+    target_price: float
+    alert_type: str  # "above" or "below"
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
