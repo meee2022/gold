@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, ChevronLeft } from "lucide-react";
+import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, ChevronLeft, Info, Shield } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
@@ -55,6 +55,8 @@ const ProfilePage = () => {
     { icon: Heart, label: "المفضلة", path: "/favorites" },
     { icon: MapPin, label: "العناوين", path: "/addresses" },
     { icon: CreditCard, label: "طرق الدفع", path: "/payments" },
+    { icon: Shield, label: "الشروط الشرعية", path: "/sharia" },
+    { icon: Info, label: "عن زينة وخزينة", path: "/about" },
     { icon: Settings, label: "الإعدادات", path: "/settings" },
   ];
 

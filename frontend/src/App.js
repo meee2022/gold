@@ -7,6 +7,7 @@ import GiftsPage from "./pages/GiftsPage";
 import StorePage from "./pages/StorePage";
 import CartPage from "./pages/CartPage";
 import ShariaPage from "./pages/ShariaPage";
+import AboutPage from "./pages/AboutPage";
 import AuthPage, { AuthCallback } from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrdersPage from "./pages/OrdersPage";
@@ -32,6 +33,7 @@ function AppRouter() {
       <Route path="/store" element={<StorePage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/sharia" element={<ShariaPage />} />
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/profile" element={<ProfilePage />} />
