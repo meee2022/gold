@@ -54,11 +54,16 @@ export const TopHeader = ({ title, showBack = false, showCart = true, showNotifi
   const navigate = useNavigate();
   const { user } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+  const [notifCount, setNotifCount] = useState(0);
 
   useEffect(() => {
     if (user) {
       apiCall("get", "/cart").then(res => {
         setCartCount(res.data.items?.length || 0);
+      }).catch(() => {});
+      
+      apiCall("get", "/notifications").then(res => {
+        setNotifCount(res.data.unread_count || 0);
       }).catch(() => {});
     }
   }, [user]);
@@ -88,8 +93,13 @@ export const TopHeader = ({ title, showBack = false, showCart = true, showNotifi
       
       <div className="flex items-center gap-2">
         {showNotification && (
-          <button className="p-2 rounded-full hover:bg-[#1A1A1A] transition-colors relative" data-testid="notification-btn">
+          <button onClick={() => navigate("/notifications")} className="p-2 rounded-full hover:bg-[#1A1A1A] transition-colors relative" data-testid="notification-btn">
             <Bell size={22} className="text-[#A1A1AA]" />
+            {notifCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {notifCount}
+              </span>
+            )}
           </button>
         )}
         {showCart && (
