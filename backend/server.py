@@ -358,30 +358,23 @@ async def update_gold_prices():
     usd_per_oz = 2380  # Default fallback
     
     try:
-        # Try metals.live API with SSL verification disabled (for environments with SSL issues)
-        async with httpx.AsyncClient(verify=False) as http_client:
-            response = await http_client.get("https://api.metals.live/v1/spot/gold", timeout=10)
+        # Use goldprice.org free API (works reliably)
+        async with httpx.AsyncClient(timeout=15) as http_client:
+            response = await http_client.get("https://data-asg.goldprice.org/dbXRates/USD")
             if response.status_code == 200:
                 data = response.json()
-                usd_per_oz = float(data[0].get('price', 2380)) if isinstance(data, list) else 2380
-                logger.info(f"Fetched gold price from metals.live: ${usd_per_oz}/oz")
+                # API returns price per kilogram, convert to ounce
+                xau_price_kg = float(data.get('items', [{}])[0].get('xauPrice', 0))
+                if xau_price_kg > 0:
+                    # Convert from USD/kg to USD/oz (1 kg = 32.1507 oz)
+                    usd_per_oz = xau_price_kg / 32.1507
+                    logger.info(f"Fetched gold price from goldprice.org: ${usd_per_oz:.2f}/oz")
+                else:
+                    logger.warning("Invalid price from goldprice.org, using fallback")
+            else:
+                logger.warning(f"Goldprice API returned {response.status_code}")
     except Exception as e:
-        logger.warning(f"Metals.live failed: {e}, trying goldapi.io...")
-        
-        # Fallback to goldapi.io free tier
-        try:
-            async with httpx.AsyncClient(verify=False) as http_client:
-                response = await http_client.get(
-                    "https://www.goldapi.io/api/XAU/USD",
-                    headers={"x-access-token": "goldapi-demo"},
-                    timeout=10
-                )
-                if response.status_code == 200:
-                    data = response.json()
-                    usd_per_oz = float(data.get('price', 2380))
-                    logger.info(f"Fetched gold price from goldapi: ${usd_per_oz}/oz")
-        except Exception as e2:
-            logger.error(f"All gold APIs failed: {e2}, using fallback price")
+        logger.error(f"Error fetching gold price: {e}")
     
     # Convert to QAR (1 USD = 3.64 QAR)
     qar_per_oz = usd_per_oz * 3.64
