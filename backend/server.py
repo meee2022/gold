@@ -599,6 +599,191 @@ async def logout(response: Response):
     response.delete_cookie(key="session_token", path="/")
     return {"message": "تم تسجيل الخروج بنجاح"}
 
+# ==================== PASSWORD RESET ====================
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(data: PasswordResetRequest, background_tasks: BackgroundTasks):
+    """Request password reset - sends email with reset link"""
+    user = await db.users.find_one({"email": data.email}, {"_id": 0})
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        return {"message": "إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة لإعادة تعيين كلمة المرور"}
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    # Store reset token
+    await db.password_resets.update_one(
+        {"email": data.email},
+        {"$set": {
+            "email": data.email,
+            "token": reset_token,
+            "expires_at": expires_at.isoformat(),
+            "used": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    # Send email in background
+    if RESEND_API_KEY and RESEND_API_KEY != "re_123_placeholder":
+        background_tasks.add_task(send_reset_email, data.email, user.get("name", ""), reset_token)
+        logger.info(f"Password reset email queued for {data.email}")
+    else:
+        # For testing without real API key, log the token
+        logger.warning(f"RESEND_API_KEY not configured. Reset token for {data.email}: {reset_token}")
+    
+    return {"message": "إذا كان البريد الإلكتروني مسجلاً، ستصلك رسالة لإعادة تعيين كلمة المرور", "debug_token": reset_token if not RESEND_API_KEY or RESEND_API_KEY == "re_123_placeholder" else None}
+
+async def send_reset_email(email: str, name: str, token: str):
+    """Send password reset email via Resend"""
+    try:
+        html_content = f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #0A0A0A; color: #ffffff;">
+            <div style="text-align: center; padding: 20px 0; border-bottom: 2px solid #D4AF37;">
+                <h1 style="color: #D4AF37; margin: 0;">زينة وخزينة</h1>
+            </div>
+            <div style="padding: 30px 20px;">
+                <h2 style="color: #D4AF37;">مرحباً {name}</h2>
+                <p style="color: #A1A1AA; line-height: 1.8;">لقد تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك.</p>
+                <p style="color: #A1A1AA; line-height: 1.8;">رمز إعادة التعيين:</p>
+                <div style="background-color: #1A1A1A; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                    <code style="color: #D4AF37; font-size: 24px; letter-spacing: 2px;">{token[:8]}</code>
+                </div>
+                <p style="color: #A1A1AA; font-size: 14px;">صالح لمدة ساعة واحدة فقط.</p>
+                <p style="color: #666; font-size: 12px; margin-top: 30px;">إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذه الرسالة.</p>
+            </div>
+            <div style="text-align: center; padding: 20px; border-top: 1px solid #27272A; color: #666; font-size: 12px;">
+                © 2024 زينة وخزينة - جميع الحقوق محفوظة
+            </div>
+        </div>
+        """
+        
+        params = {
+            "from": SENDER_EMAIL,
+            "to": [email],
+            "subject": "إعادة تعيين كلمة المرور - زينة وخزينة",
+            "html": html_content
+        }
+        
+        await asyncio.to_thread(resend.Emails.send, params)
+        logger.info(f"Reset email sent to {email}")
+    except Exception as e:
+        logger.error(f"Failed to send reset email: {e}")
+
+@api_router.post("/auth/reset-password")
+async def reset_password(data: PasswordResetConfirm):
+    """Reset password using token"""
+    # Find valid reset token
+    reset = await db.password_resets.find_one({
+        "token": {"$regex": f"^{data.token[:8]}"},
+        "used": False
+    }, {"_id": 0})
+    
+    if not reset:
+        raise HTTPException(status_code=400, detail="رمز إعادة التعيين غير صالح أو منتهي الصلاحية")
+    
+    # Check expiration
+    expires_at = datetime.fromisoformat(reset["expires_at"])
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="انتهت صلاحية رمز إعادة التعيين")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    result = await db.users.update_one(
+        {"email": reset["email"]},
+        {"$set": {"password_hash": new_hash}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # Mark token as used
+    await db.password_resets.update_one(
+        {"token": reset["token"]},
+        {"$set": {"used": True}}
+    )
+    
+    return {"message": "تم تغيير كلمة المرور بنجاح"}
+
+# ==================== NOTIFICATIONS ====================
+
+@api_router.get("/notifications")
+async def get_notifications(request: Request):
+    """Get user notifications"""
+    user = await get_current_user(request)
+    notifications = await db.notifications.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    unread_count = sum(1 for n in notifications if not n.get("read", False))
+    return {"notifications": notifications, "unread_count": unread_count}
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(request: Request, notification_id: str):
+    """Mark notification as read"""
+    user = await get_current_user(request)
+    await db.notifications.update_one(
+        {"notification_id": notification_id, "user_id": user["user_id"]},
+        {"$set": {"read": True}}
+    )
+    return {"message": "تم التحديث"}
+
+@api_router.post("/notifications/mark-all-read")
+async def mark_all_notifications_read(request: Request):
+    """Mark all notifications as read"""
+    user = await get_current_user(request)
+    await db.notifications.update_many(
+        {"user_id": user["user_id"], "read": False},
+        {"$set": {"read": True}}
+    )
+    return {"message": "تم تحديث جميع الإشعارات"}
+
+# ==================== PRICE ALERTS ====================
+
+@api_router.post("/price-alerts")
+async def create_price_alert(request: Request, alert: PriceAlert):
+    """Create a price alert"""
+    user = await get_current_user(request)
+    
+    alert_doc = {
+        "alert_id": f"alert_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "karat": alert.karat,
+        "target_price": alert.target_price,
+        "alert_type": alert.alert_type,
+        "triggered": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.price_alerts.insert_one(alert_doc)
+    
+    return {"message": "تم إنشاء التنبيه", "alert": {k: v for k, v in alert_doc.items() if k != "_id"}}
+
+@api_router.get("/price-alerts")
+async def get_price_alerts(request: Request):
+    """Get user's price alerts"""
+    user = await get_current_user(request)
+    alerts = await db.price_alerts.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    return alerts
+
+@api_router.delete("/price-alerts/{alert_id}")
+async def delete_price_alert(request: Request, alert_id: str):
+    """Delete a price alert"""
+    user = await get_current_user(request)
+    result = await db.price_alerts.delete_one({
+        "alert_id": alert_id,
+        "user_id": user["user_id"]
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="التنبيه غير موجود")
+    return {"message": "تم حذف التنبيه"}
+
 # ==================== GOLD PRICES ====================
 
 @api_router.get("/gold-prices", response_model=List[GoldPriceResponse])
