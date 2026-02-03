@@ -230,6 +230,7 @@ input:focus, textarea:focus, select:focus {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -237,4 +238,11 @@ input:focus, textarea:focus, select:focus {
 /* Tab indicator animation */
 .tab-indicator {
     transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* Hide Emergent badge */
+#emergent-badge {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
