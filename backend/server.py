@@ -33,6 +33,16 @@ JWT_ALGORITHM = "HS256"
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'eng.mohamed87@live.com')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Realmadridclub2011')
 
+# Resend Config for email
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
+# Gold price tracking
+last_gold_prices = {}
+price_update_subscribers = []
+
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
