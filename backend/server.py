@@ -257,6 +257,10 @@ async def startup_event():
     designers_count = await db.designers.count_documents({})
     if designers_count == 0:
         await seed_qatari_designers()
+    
+    # Start background task for periodic price updates
+    asyncio.create_task(periodic_price_update())
+    logger.info("Started periodic gold price updates (every 5 minutes)")
 
 async def seed_sample_merchants():
     merchants = [
