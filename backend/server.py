@@ -358,21 +358,26 @@ async def update_gold_prices():
     usd_per_oz = 2380  # Default fallback
     
     try:
-        # Use goldprice.org free API (works reliably)
-        async with httpx.AsyncClient(timeout=15) as http_client:
+        # Use goldprice.org free API with browser-like headers
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json",
+            "Referer": "https://goldprice.org/"
+        }
+        async with httpx.AsyncClient(timeout=15, headers=headers) as http_client:
             response = await http_client.get("https://data-asg.goldprice.org/dbXRates/USD")
             if response.status_code == 200:
                 data = response.json()
-                # API returns price per kilogram, convert to ounce
+                # API returns price per kilogram
                 xau_price_kg = float(data.get('items', [{}])[0].get('xauPrice', 0))
                 if xau_price_kg > 0:
                     # Convert from USD/kg to USD/oz (1 kg = 32.1507 oz)
                     usd_per_oz = xau_price_kg / 32.1507
-                    logger.info(f"Fetched gold price from goldprice.org: ${usd_per_oz:.2f}/oz")
+                    logger.info(f"Fetched LIVE gold price: ${usd_per_oz:.2f}/oz")
                 else:
-                    logger.warning("Invalid price from goldprice.org, using fallback")
+                    logger.warning("Invalid price from API, using fallback")
             else:
-                logger.warning(f"Goldprice API returned {response.status_code}")
+                logger.warning(f"Gold API returned {response.status_code}")
     except Exception as e:
         logger.error(f"Error fetching gold price: {e}")
     
