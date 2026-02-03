@@ -1,0 +1,198 @@
+<analysis>**original_problem_statement:**
+The user wants to build a mobile-first Arabic (RTL) web app named زينة وخزينة (ZEINA & KHAZINA) for gold trading and a marketplace for jewelry.
+
+**PRODUCT REQUIREMENTS:**
+- **Tech Stack:** React + FastAPI + MongoDB.
+- **Design:** A luxurious Black & Gold theme, mobile-first responsive design, closely matching the provided UI screenshots. The app must be entirely in Arabic (RTL).
+- **Core Features:**
+    1.  **Home Page:** Display live gold prices (from Metals.live API), a hero banner, and quick access cards.
+    2.  **Investment Section:** Allow users to digitally buy/sell gold. It must include a gold calculator based on weight and karat.
+    3.  **Store:** Originally a single section, it has been split into:
+        -   **Jewelry Store:** For trusted merchants.
+        -   **Qatari Designers Section:** A separate section to showcase specific Qatari jewelry designers and their products.
+    4.  **Gifts Section:** For giftable gold items with customizable greeting messages.
+    5.  **Sharia Compliance:** A mandatory agreement page users must accept before investing.
+    6.  **Authentication:** Support for both Email/Password and Google Social Login.
+    7.  **Shopping Cart:** A functional cart where users can add jewelry, designer products, and custom gold investments.
+    8.  **Admin Role:** An admin user (credentials provided) to manage products and merchants.
+- **Database:** The user provided a MongoDB Atlas URI, but due to connection issues, the agent switched to a local MongoDB instance.
+
+**User's preferred language**: العربية (Arabic). The next agent MUST respond in Arabic only.
+
+**what currently exists?**
+A full-stack application has been developed with a FastAPI backend and a React frontend. The backend is connected to a local MongoDB and has seeded data for gold prices, products, and designers. The frontend implements the requested black and gold, RTL, mobile-first design.
+
+Key implemented features include:
+- A home page with (seeded) gold prices.
+- An investment page with a functional gold calculator.
+- A functional shopping cart integrated with the investment and product pages.
+- A bottom navigation bar with icons for Home, Store, Cart, and Investment.
+- Backend APIs for authentication, products, designers, cart, and wallet.
+- User authentication (email/password).
+
+**Last working item**:
+- **Last item agent was working:** The agent was addressing a user complaint that the Qatari Designers page was incorrectly displaying jewelry content. The agent identified that the routes for the newly created  and  were missing in  and applied a fix. However, before verifying the fix, the user submitted a new request to add About and Sharia pages.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** Frontend testing agent
+- **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+- **Issue 1 (P0):** Qatari Designers page displays the wrong content.
+- **Issue 2 (P1):** The initial MongoDB Atlas connection provided by the user failed.
+
+**Issues Detail:**
+- **Issue 1:** Qatari Designers page displays the wrong content
+    - **Attempted fixes:** The agent added the missing routes for  and  in . The fix has not been tested yet.
+    - **Next debug checklist:**
+        1.  Restart the frontend service and take a screenshot of the  page to verify it loads the correct component ().
+        2.  Confirm that the  component fetches data from the  endpoint.
+        3.  Ensure the page correctly renders the list of designers.
+    - **Why fix this issue and what will be achieved with the fix?** This is a key feature. Fixing it will correctly display the designers' section as requested by the user.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Frontend
+    - **Blocked on other issue:** None
+
+- **Issue 2:** MongoDB Atlas Connection Failure
+    - **Attempted fixes:** The agent tried adding , which did not resolve the SSL error. As a workaround, the agent switched to the local MongoDB instance.
+    - **Next debug checklist:**
+        1.  Investigate the SSL error in the backend logs.
+        2.  Try reconnecting to the user's MongoDB Atlas URI using  in the  constructor within .
+    - **Why fix this issue and what will be achieved with the fix?** The user's data should be persistent in their own database. The local DB is a temporary solution.
+    - **Status:** NOT STARTED
+    - **Is recurring issue?** Y
+    - **Should Test frontend/backend/both after fix?** Backend
+    - **Blocked on other issue:** None
+
+**In progress Task List**:
+- **Task 1:** Finalize the separation of the Qatari Designers section.
+    - **Where to resume:** The core files (, ) have been created and routes have been added. The immediate step is to verify the fix for **Issue 1** and ensure the navigation and page content are correct.
+    - **What will be achieved with this?** The app's navigation structure will match the user's request, with Jewelry and Designers as distinct sections.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** Frontend
+    - **Blocked on something:** Issue 1
+
+**Upcoming and Future Tasks**
+- **Upcoming Tasks:**
+    - **P1: Create About and Sharia Pages:**
+        - Create a new page  based on the user's screenshot.
+        - Update  based on the screenshot.
+        - Add routes for these pages in .
+        - Add links to these new pages in the user's profile/settings page ().
+    - **P1: Update Bottom Navigation:**
+        - Add Gifts and Designers icons/links to the bottom navigation bar in . The user asked for Gifts, and the new Designers section also needs a navigation entry.
+    - **P2: Implement Designer Detail Page:**
+        - Complete the functionality for  to fetch and display information for a specific designer. This will require a backend endpoint like .
+- **Future Tasks:**
+    - **P2: Implement Live Gold Prices:**
+        - Replace the seeded gold price data with a live fetch from an external API like . This involves adding an API key to  and creating a background task or scheduled job in  to update prices periodically.
+    - **P3: Full Payment Gateway Integration:**
+        - Replace the mocked payment UI with a real payment provider integration (e.g., Stripe).
+
+**Completed work in this session**
+- **Recently completed:**
+    - **Application Scaffolding:** Initialized the React/FastAPI project structure and styling.
+    - **Investment Calculator:** Implemented a gold calculator on the investment page ().
+    - **Shopping Cart Integration:** Added a cart icon to the navigation and implemented the logic to add both standard products and custom gold investments to the cart.
+    - **Qatari Designers Section (Initial version):** Added backend seeding and API endpoints for designers and separated the store into Jewelry and Designers tabs.
+    - **Bug Fix (Backend):** Resolved a  serialization error in the  endpoint.
+    - **UI Fix (Frontend):** Added text to the Add to Cart button for better clarity.
+
+**Earlier issues found/mentioned but not fixed**
+- **Issue 1:** MongoDB Atlas Connection Failure
+    - **Debug checklist:** See **Issues Detail** section above.
+    - **Why to solve this issue and what will be achieved with this?** To ensure data persistence in the user's specified database.
+    - **Should Test frontend/backend/both after fix:** Backend
+    - **Is recurring issue?** Y
+
+**Known issue recurrence from previous fork**
+- N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+- **Frontend:** React, Tailwind CSS,  icons
+- **Backend:** FastAPI, Motor (async MongoDB driver)
+- **Database:** MongoDB
+- **Architecture:** Mobile-first, Right-to-Left (RTL), Single Page Application (SPA) with a RESTful API.
+
+**key DB schema**
+- **users:** , , , 
+- **products:**  (jewelry/designer), , , , , , 
+- **designers:** , , 
+- **cart:** Managed via user document, includes , , and details for custom gold investments.
+- **gold_prices:** , 
+
+**changes in tech stack**
+- None
+
+**All files of reference**
+- **/app/backend/server.py**: Contains all backend logic. Recently updated for cart and designer features.
+- **/app/frontend/src/App.js**: The main router. Recently modified to add routes for the designers' pages.
+- **/app/frontend/src/pages/DesignersPage.js**: Newly created page to list designers. Its content is not displaying correctly.
+- **/app/frontend/src/pages/DesignerDetailPage.js**: Placeholder page for designer details.
+- **/app/frontend/src/components/Navigation.js**: Defines the bottom navigation bar. Needs to be updated with new sections.
+- **/app/frontend/src/pages/StorePage.js**: Updated to only show jewelry products.
+
+**Areas that need refactoring**:
+- The  file is monolithic and contains all backend logic. It should be refactored into a modular structure (e.g., separate directories for routes, models, and services).
+- Frontend components in files like  could be broken down into smaller, more specific components for better reusability and maintenance.
+
+**key api endpoints**
+- , 
+- 
+- 
+- 
+- 
+- , , 
+
+**Critical Info for New Agent**
+- The user's primary language is **Arabic**. All communication MUST be in Arabic.
+- The immediate priority is to fix the **Qatari Designers page**, which is showing incorrect content. Verify the route fix in  and ensure the  component works as intended.
+- The application is currently using a **local MongoDB instance** due to an SSL connection error with the user's provided Atlas DB. Do not attempt to switch back without a proper SSL fix.
+- The user has requested several UI changes simultaneously: creating About and Sharia pages and updating the bottom navigation. Address the critical bug first before proceeding with these new features.
+
+**documents and test reports created in this job**
+- 
+- 
+- 
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User (Pending):** Add About and Sharia pages (screenshots provided) and link them in the account settings. Make sure they are mobile-friendly.
+2.  **Agent (Acknowledged):** I will fix the designers page first, then create the About page and add the links.
+3.  **User (Pending):** The designer names are missing from the Designers section.
+4.  **Agent (In Progress):** The routes are missing in , I am fixing it.
+5.  **User (Pending):** The Qatari Designers page shows jewelry content, not designers. It should show designer names, details, and products.
+6.  **Agent:** I will fix that by updating .
+7.  **User (Pending):** Separate Qatari Designers into a new section, create a detail page for them, and add Gifts to the bottom nav.
+8.  **Agent:** Acknowledged the plan.
+9.  **User:** Request to create the Qatari Designers section with a specific list of names.
+10. **Agent:** Finished implementing the cart feature.
+
+**Project Health Check:**
+- **Broken:**
+    - Routing to the Qatari Designers page is not working correctly.
+- **Mocked:**
+    - Live gold prices are from a seeded list, not a live API.
+    - The payment process is a UI mockup only.
+
+**3rd Party Integrations**
+- **Metals.live API:** Planned for gold prices. Requires User API Key.
+- **Emergent-managed Google Auth:** Planned for social login.
+
+**Testing status**
+- **Testing agent used after significant changes:** YES (once)
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None
+- **Known regressions:** The Qatari Designers page broke after being refactored from a tab into a standalone page.
+
+**Credentials to test flow:**
+- **Admin Email:** 
+- **Admin Password:** 
+
+**What agent forgot to execute**
+- The agent has not yet implemented the live gold price fetching from an external API.
+- The agent did not verify the fix for the Qatari Designers page before acknowledging the user's next request.
+- The agent has not yet added the Gifts page link to the bottom navigation bar as requested.</analysis>
