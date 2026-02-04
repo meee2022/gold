@@ -9,6 +9,7 @@ import CartPage from "./pages/CartPage";
 import ShariaPage from "./pages/ShariaPage";
 import AboutPage from "./pages/AboutPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import ReceivedGiftPage from "./pages/ReceivedGiftPage";
 import AuthPage, { AuthCallback } from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrdersPage from "./pages/OrdersPage";
@@ -31,6 +32,8 @@ function AppRouter() {
       <Route path="/" element={<HomePage />} />
       <Route path="/investment" element={<InvestmentPage />} />
       <Route path="/gifts" element={<GiftsPage />} />
+      <Route path="/gifts/received/:giftId" element={<ReceivedGiftPage />} />
+      <Route path="/gifts/received" element={<ReceivedGiftPage />} />
       <Route path="/store" element={<StorePage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/sharia" element={<ShariaPage />} />
