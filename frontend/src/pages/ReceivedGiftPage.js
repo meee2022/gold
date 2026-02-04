@@ -49,7 +49,8 @@ const ReceivedGiftPage = () => {
         setGoldPrice(price24k.price_per_gram_qar);
       }
     } catch (error) {
-      console.error("Failed to fetch gold price");
+      // Fallback price if API fails
+      setGoldPrice(594.67);
     }
     setRefreshing(false);
   };
