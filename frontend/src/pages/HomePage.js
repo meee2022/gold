@@ -25,8 +25,9 @@ const HomePage = () => {
         axios.get(`${API}/gold-prices`),
         axios.get(`${API}/products?type=jewelry`)
       ]);
-      setPrices(pricesRes.data);
-      setProducts(productsRes.data.slice(0, 4));
+      setPrices(Array.isArray(pricesRes.data) ? pricesRes.data : []);
+      const prodsData = Array.isArray(productsRes.data) ? productsRes.data : [];
+      setProducts(prodsData.slice(0, 4));
     } catch (error) {
       console.error(error);
     }
