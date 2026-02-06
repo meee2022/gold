@@ -16,18 +16,17 @@ import httpx
 import asyncio
 import resend
 import secrets
+import certifi
 
 ROOT_DIR = Path(__file__).parent
 env_path = ROOT_DIR / '.env'
 if env_path.exists():
     load_dotenv(env_path)
-else:
-    logger.warning(f".env file not found at {env_path}")
 
-# MongoDB connection
+# MongoDB connection with SSL certificate
 mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://Meee87:Realmadridclub2011@gold.jazujkd.mongodb.net/?appName=Gold')
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'gold')]
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
+db = client[os.environ.get('DB_NAME', 'zeina_khazina')]
 
 # JWT Config
 JWT_SECRET = os.environ.get('JWT_SECRET', 'zeina_khazina_secret_2024')
