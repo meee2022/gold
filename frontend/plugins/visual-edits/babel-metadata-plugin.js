@@ -862,7 +862,9 @@ const babelMetadataPlugin = ({ types: t }) => {
           if (!localName) return;
 
           // Search for usages of this component
-          importPath.parentPath.parentPath.traverse({
+          const rootPath = importPath.parentPath && importPath.parentPath.parentPath;
+          if (!rootPath) return;
+          rootPath.traverse({
             JSXOpeningElement(jsxPath) {
               if (result) return;
 
@@ -969,19 +971,9 @@ const babelMetadataPlugin = ({ types: t }) => {
         isEditable = arrayInfo.isEditable && arrayInfo.valueType === "array";
       }
     } else if (t.isMemberExpression(arrayNode)) {
-      // Handle cases like data.items.map(...)
-      const memberInfo = analyzeMemberExpression(
-        callExprParent.get("callee.object"),
-        state
-      );
-      if (memberInfo) {
-        arrayVar = memberInfo.varName;
-        arrayFile = memberInfo.file || null;
-        absFile = memberInfo.absFile || null;
-        arrayLine = memberInfo.line || null;
-        // Array within object is more complex, mark as not editable for now
-        isEditable = false;
-      }
+      // Handle cases like data.items.map(...) - skip to avoid recursion
+      arrayVar = "unknown_member";
+      isEditable = false;
     }
 
     return {

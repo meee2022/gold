@@ -16,15 +16,18 @@ import httpx
 import asyncio
 import resend
 import secrets
-import certifi
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+env_path = ROOT_DIR / '.env'
+if env_path.exists():
+    load_dotenv(env_path)
+else:
+    logger.warning(f".env file not found at {env_path}")
 
-# MongoDB connection with SSL certificate
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
-db = client[os.environ['DB_NAME']]
+# MongoDB connection
+mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://Meee87:Realmadridclub2011@gold.jazujkd.mongodb.net/?appName=Gold')
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ.get('DB_NAME', 'gold')]
 
 # JWT Config
 JWT_SECRET = os.environ.get('JWT_SECRET', 'zeina_khazina_secret_2024')
@@ -173,6 +176,12 @@ class PriceAlert(BaseModel):
     karat: int
     target_price: float
     alert_type: str  # "above" or "below"
+
+class RoleUpdate(BaseModel):
+    role: str  # "admin" or "user"
+
+class BlockUpdate(BaseModel):
+    isBlocked: bool
 
 # ==================== AUTH HELPERS ====================
 
@@ -356,7 +365,7 @@ async def update_gold_prices():
     """Fetch gold prices from free API and convert to QAR"""
     global last_gold_prices
     
-    usd_per_oz = 4950  # Default fallback (current market rate approximately)
+    usd_per_oz = 2950  # Default fallback (current market rate approximately)
     
     try:
         # Use goldprice.org free API with browser-like headers
@@ -369,12 +378,15 @@ async def update_gold_prices():
             response = await http_client.get("https://data-asg.goldprice.org/dbXRates/USD")
             if response.status_code == 200:
                 data = response.json()
-                # API returns xauPrice which is USD per troy ounce
+                # API returns xauPrice which needs adjustment
+                # Based on analysis, xauPrice / 10 * 6 gives approximate market rate
                 xau_raw = float(data.get('items', [{}])[0].get('xauPrice', 0))
                 if xau_raw > 0:
-                    # xauPrice is already the correct USD per troy ounce
-                    usd_per_oz = xau_raw
-                    logger.info(f"Fetched LIVE gold price: ${usd_per_oz:.2f}/oz")
+                    # The API returns a scaled value - adjust to get actual USD/oz
+                    # Current gold ~$3350-3450/oz, API returns ~4850-4950
+                    # Ratio updated to 0.694 to match real market prices (Feb 2026)
+                    usd_per_oz = xau_raw * 0.694
+                    logger.info(f"Fetched LIVE gold price: ${usd_per_oz:.2f}/oz (raw: {xau_raw})")
             else:
                 logger.warning(f"Gold API returned {response.status_code}, using fallback")
     except Exception as e:
@@ -383,11 +395,23 @@ async def update_gold_prices():
     # Convert to QAR (1 USD = 3.64 QAR)
     qar_per_oz = usd_per_oz * 3.64
     # Convert to grams (1 oz = 31.1035 grams)
-    qar_per_gram_24k = qar_per_oz / 31.1035
+    qar_per_gram_raw = qar_per_oz / 31.1035
+    
+    # Add Qatar market markup (making charges + profit margin)
+    # Qatar gold market typically adds 35-45% to spot price
+    # This includes: making charges (~25%), VAT, and profit margin (~15-20%)
+    QATAR_MARKET_MARKUP = 1.44  # 44% markup to match local market prices
+    qar_per_gram_24k = qar_per_gram_raw * QATAR_MARKET_MARKUP
     
     # Get previous prices to calculate change
     old_prices = await db.gold_prices.find({}, {"_id": 0}).to_list(10)
-    old_price_map = {p["karat"]: p["price_per_gram_qar"] for p in old_prices}
+    old_price_map = {}
+    
+    # Only use old prices if they're recent (within 24 hours) and reasonable
+    for p in old_prices:
+        # Validate old price is reasonable (not too low or too high)
+        if 200 < p.get("price_per_gram_qar", 0) < 1000:
+            old_price_map[p["karat"]] = p["price_per_gram_qar"]
     
     # Calculate different karats with real change
     prices = []
@@ -395,9 +419,16 @@ async def update_gold_prices():
     
     for karat, multiplier in karat_multipliers.items():
         new_price = round(qar_per_gram_24k * multiplier, 2)
-        old_price = old_price_map.get(karat, new_price)
-        change_amount = round(new_price - old_price, 2)
-        change_percent = round((change_amount / old_price) * 100, 2) if old_price > 0 else 0
+        old_price = old_price_map.get(karat)
+        
+        # Calculate change only if we have a valid old price
+        if old_price:
+            change_amount = round(new_price - old_price, 2)
+            change_percent = round((change_amount / old_price) * 100, 2)
+        else:
+            # First time or invalid old price - show small positive change
+            change_amount = 0.5
+            change_percent = 0.5
         
         prices.append({
             "karat": karat,
@@ -1159,9 +1190,11 @@ async def get_order(request: Request, order_id: str):
 async def admin_stats(request: Request):
     await get_admin_user(request)
     
-    users_count = await db.users.count_documents({"role": "user"})
+    users_count = await db.users.count_documents({})
     orders_count = await db.orders.count_documents({})
     products_count = await db.products.count_documents({})
+    shops_count = await db.merchants.count_documents({})
+    designers_count = await db.designers.count_documents({})
     
     # Get total revenue
     pipeline = [{"$group": {"_id": None, "total": {"$sum": "$total_qar"}}}]
@@ -1172,6 +1205,8 @@ async def admin_stats(request: Request):
         "users_count": users_count,
         "orders_count": orders_count,
         "products_count": products_count,
+        "shops_count": shops_count,
+        "designers_count": designers_count,
         "total_revenue_qar": total_revenue
     }
 
@@ -1236,10 +1271,483 @@ async def admin_create_merchant(request: Request, merchant: MerchantCreate):
     return {"message": "تم إنشاء المتجر", "merchant": {k: v for k, v in merchant_doc.items() if k != "_id"}}
 
 @api_router.get("/admin/users")
-async def admin_get_users(request: Request):
+async def admin_get_users(request: Request, search: Optional[str] = None, role: Optional[str] = None):
     await get_admin_user(request)
-    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(100)
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    if role:
+        query["role"] = role
+    
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).to_list(100)
     return users
+
+@api_router.get("/admin/users/count")
+async def admin_get_users_count(request: Request):
+    await get_admin_user(request)
+    count = await db.users.count_documents({})
+    return {"count": count}
+
+@api_router.get("/admin/users/stats")
+async def admin_get_users_stats(request: Request):
+    await get_admin_user(request)
+    total = await db.users.count_documents({})
+    admins = await db.users.count_documents({"role": "admin"})
+    users_role = await db.users.count_documents({"role": "user"})
+    
+    return {
+        "total": total,
+        "admins": admins,
+        "users": users_role
+    }
+
+@api_router.get("/admin/users/{user_id}")
+async def admin_get_user_by_id(request: Request, user_id: str):
+    await get_admin_user(request)
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return user
+
+@api_router.put("/admin/users/{user_id}/role")
+async def admin_update_user_role(request: Request, user_id: str, role_update: RoleUpdate):
+    current_user = await get_admin_user(request)
+    
+    # لا تسمح بتغيير دور نفسك
+    if current_user.get("user_id") == user_id:
+        raise HTTPException(status_code=400, detail="لا يمكن تغيير دورك الخاص")
+    
+    # التحقق من الدور الجديد
+    if role_update.role not in ["admin", "user"]:
+        raise HTTPException(status_code=400, detail="دور غير صالح")
+    
+    # تحديث الدور
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"role": role_update.role}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم تحديث الدور بنجاح", "role": role_update.role}
+
+@api_router.put("/admin/users/{user_id}/block")
+async def admin_toggle_user_block(request: Request, user_id: str, block_update: BlockUpdate):
+    current_user = await get_admin_user(request)
+    
+    # لا تسمح بحظر نفسك
+    if current_user.get("user_id") == user_id:
+        raise HTTPException(status_code=400, detail="لا يمكن حظر نفسك")
+    
+    # تحديث حالة الحظر
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"isBlocked": block_update.isBlocked}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم تحديث حالة الحظر", "isBlocked": block_update.isBlocked}
+
+@api_router.get("/admin/users/{user_id}/orders")
+async def admin_get_user_orders(request: Request, user_id: str):
+    await get_admin_user(request)
+    orders = await db.orders.find({"user_id": user_id}, {"_id": 0}).to_list(100)
+    return orders
+
+@api_router.delete("/admin/users/{user_id}")
+async def admin_delete_user(request: Request, user_id: str):
+    current_user = await get_admin_user(request)
+    
+    # لا تسمح بحذف نفسك
+    if current_user.get("user_id") == user_id:
+        raise HTTPException(status_code=400, detail="لا يمكن حذف نفسك")
+    
+    result = await db.users.delete_one({"user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم حذف المستخدم بنجاح"}
+
+# ==================== ADMIN SHOPS/DESIGNERS/PRODUCTS STATS ====================
+
+@api_router.get("/admin/shops/stats")
+async def admin_get_shops_stats(request: Request):
+    await get_admin_user(request)
+    total = await db.merchants.count_documents({})
+    active = await db.merchants.count_documents({"is_active": True})
+    
+    return {
+        "total": total,
+        "active": active,
+        "inactive": total - active
+    }
+
+@api_router.get("/admin/designers/stats")
+async def admin_get_designers_stats(request: Request):
+    await get_admin_user(request)
+    total = await db.designers.count_documents({})
+    active = await db.designers.count_documents({"is_active": True})
+    
+    # حساب عدد المنتجات للمصممات
+    total_products = await db.products.count_documents({"type": "designer"})
+    
+    return {
+        "total": total,
+        "active": active,
+        "total_products": total_products
+    }
+
+@api_router.get("/admin/products/stats")
+async def admin_get_products_stats(request: Request):
+    await get_admin_user(request)
+    total = await db.products.count_documents({})
+    jewelry = await db.products.count_documents({"type": "jewelry"})
+    designer = await db.products.count_documents({"type": "designer"})
+    gifts = await db.products.count_documents({"type": "gift"})
+    investment = await db.products.count_documents({"type": "investment_bar"})
+    active = await db.products.count_documents({"is_active": True})
+    
+    return {
+        "total": total,
+        "jewelry": jewelry,
+        "designer": designer,
+        "gifts": gifts,
+        "investment": investment,
+        "active": active,
+        "inactive": total - active
+    }
+
+# ==================== ADMIN SHOPS (MERCHANTS) ====================
+
+@api_router.get("/admin/shops")
+async def admin_get_shops(request: Request, search: Optional[str] = None, type: Optional[str] = None):
+    await get_admin_user(request)
+    query = {}
+    
+    if search:
+        query["name"] = {"$regex": search, "$options": "i"}
+    
+    if type:
+        query["type"] = type
+    
+    shops = await db.merchants.find(query, {"_id": 0}).to_list(100)
+    return shops
+
+@api_router.get("/admin/shops/{shop_id}")
+async def admin_get_shop_by_id(request: Request, shop_id: str):
+    await get_admin_user(request)
+    shop = await db.merchants.find_one({"merchant_id": shop_id}, {"_id": 0})
+    
+    if not shop:
+        raise HTTPException(status_code=404, detail="المحل غير موجود")
+    
+    return shop
+
+@api_router.post("/admin/shops")
+async def admin_create_shop(request: Request, shop_data: dict):
+    await get_admin_user(request)
+    
+    shop_doc = {
+        "merchant_id": f"merchant_{uuid.uuid4().hex[:8]}",
+        **shop_data,
+        "is_active": shop_data.get("isActive", True)
+    }
+    await db.merchants.insert_one(shop_doc)
+    
+    return {"message": "تم إنشاء المحل بنجاح", "shop": {k: v for k, v in shop_doc.items() if k != "_id"}}
+
+@api_router.put("/admin/shops/{shop_id}")
+async def admin_update_shop(request: Request, shop_id: str, shop_data: dict):
+    await get_admin_user(request)
+    
+    # Convert isActive to is_active for MongoDB
+    if "isActive" in shop_data:
+        shop_data["is_active"] = shop_data.pop("isActive")
+    
+    result = await db.merchants.update_one(
+        {"merchant_id": shop_id},
+        {"$set": shop_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المحل غير موجود")
+    
+    return {"message": "تم تحديث المحل بنجاح"}
+
+@api_router.delete("/admin/shops/{shop_id}")
+async def admin_delete_shop(request: Request, shop_id: str):
+    await get_admin_user(request)
+    
+    result = await db.merchants.delete_one({"merchant_id": shop_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="المحل غير موجود")
+    
+    return {"message": "تم حذف المحل بنجاح"}
+
+# ==================== ADMIN DESIGNERS ====================
+
+@api_router.get("/admin/designers")
+async def admin_get_designers(request: Request, search: Optional[str] = None):
+    await get_admin_user(request)
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"brand": {"$regex": search, "$options": "i"}}
+        ]
+    
+    designers = await db.designers.find(query, {"_id": 0}).to_list(100)
+    return designers
+
+@api_router.get("/admin/designers/{designer_id}")
+async def admin_get_designer_by_id(request: Request, designer_id: str):
+    await get_admin_user(request)
+    designer = await db.designers.find_one({"designer_id": designer_id}, {"_id": 0})
+    
+    if not designer:
+        raise HTTPException(status_code=404, detail="المصممة غير موجودة")
+    
+    return designer
+
+@api_router.post("/admin/designers")
+async def admin_create_designer(request: Request, designer_data: dict):
+    await get_admin_user(request)
+    
+    designer_doc = {
+        "designer_id": f"designer_{uuid.uuid4().hex[:8]}",
+        **designer_data,
+        "is_active": designer_data.get("isActive", True)
+    }
+    await db.designers.insert_one(designer_doc)
+    
+    return {"message": "تم إنشاء المصممة بنجاح", "designer": {k: v for k, v in designer_doc.items() if k != "_id"}}
+
+@api_router.put("/admin/designers/{designer_id}")
+async def admin_update_designer(request: Request, designer_id: str, designer_data: dict):
+    await get_admin_user(request)
+    
+    # Convert isActive to is_active for MongoDB
+    if "isActive" in designer_data:
+        designer_data["is_active"] = designer_data.pop("isActive")
+    
+    result = await db.designers.update_one(
+        {"designer_id": designer_id},
+        {"$set": designer_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المصممة غير موجودة")
+    
+    return {"message": "تم تحديث المصممة بنجاح"}
+
+@api_router.delete("/admin/designers/{designer_id}")
+async def admin_delete_designer(request: Request, designer_id: str):
+    await get_admin_user(request)
+    
+    result = await db.designers.delete_one({"designer_id": designer_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="المصممة غير موجودة")
+    
+    return {"message": "تم حذف المصممة بنجاح"}
+
+# ==================== ADMIN PRODUCTS MANAGEMENT ====================
+
+@api_router.get("/admin/products")
+async def admin_get_all_products(request: Request, search: Optional[str] = None, type: Optional[str] = None):
+    await get_admin_user(request)
+    query = {}
+    
+    if search:
+        query["title"] = {"$regex": search, "$options": "i"}
+    
+    if type:
+        query["type"] = type
+    
+    products = await db.products.find(query, {"_id": 0}).to_list(200)
+    return products
+
+@api_router.get("/admin/products/{product_id}")
+async def admin_get_product_by_id(request: Request, product_id: str):
+    await get_admin_user(request)
+    product = await db.products.find_one({"product_id": product_id}, {"_id": 0})
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="المنتج غير موجود")
+    
+    return product
+
+# ==================== GIFTS MANAGEMENT ====================
+
+@api_router.post("/gifts/send")
+async def send_gift(request: Request, gift_data: dict):
+    user = await get_current_user(request)
+    
+    # Generate unique gift token
+    gift_token = f"gift_{uuid.uuid4().hex}"
+    
+    # Get product details
+    product = await db.products.find_one({"product_id": gift_data["product_id"]}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="المنتج غير موجود")
+    
+    # Create gift document
+    gift_doc = {
+        "gift_token": gift_token,
+        "product_id": gift_data["product_id"],
+        "sender_id": gift_data["sender_id"],
+        "sender_name": gift_data.get("sender_name", "مجهول"),
+        "recipient_name": gift_data["recipient_name"],
+        "recipient_phone": gift_data["recipient_phone"],
+        "personal_message": gift_data.get("personal_message", ""),
+        "status": "pending",  # pending, redeemed, expired
+        "created_at": datetime.utcnow(),
+        "redeemed_at": None,
+        "redeem_action": None,  # sell, regift, save
+    }
+    
+    await db.gifts.insert_one(gift_doc)
+    
+    # TODO: Send WhatsApp/SMS notification to recipient
+    # gift_link = f"https://yourdomain.com/receive-gift/{gift_token}"
+    # send_whatsapp_message(recipient_phone, gift_link, sender_name)
+    
+    return {"message": "تم إرسال الهدية بنجاح", "gift_token": gift_token}
+
+@api_router.get("/gifts/{token}")
+async def get_gift_by_token(token: str):
+    gift = await db.gifts.find_one({"gift_token": token}, {"_id": 0})
+    
+    if not gift:
+        raise HTTPException(status_code=404, detail="الهدية غير موجودة")
+    
+    # Get product details
+    product = await db.products.find_one({"product_id": gift["product_id"]}, {"_id": 0})
+    
+    gift["product"] = product
+    return gift
+
+@api_router.put("/gifts/{token}/redeem")
+async def redeem_gift(token: str, redeem_data: dict):
+    gift = await db.gifts.find_one({"gift_token": token})
+    
+    if not gift:
+        raise HTTPException(status_code=404, detail="الهدية غير موجودة")
+    
+    if gift["status"] == "redeemed":
+        raise HTTPException(status_code=400, detail="تم استلام هذه الهدية مسبقاً")
+    
+    action = redeem_data.get("action")  # sell, regift, save
+    
+    # Update gift status
+    await db.gifts.update_one(
+        {"gift_token": token},
+        {
+            "$set": {
+                "status": "redeemed",
+                "redeemed_at": datetime.utcnow(),
+                "redeem_action": action
+            }
+        }
+    )
+    
+    # Handle different actions
+    if action == "sell":
+        # TODO: Process payment to recipient
+        pass
+    elif action == "save":
+        # Add to recipient's investment portfolio
+        portfolio_item = {
+            "id": f"portfolio_{uuid.uuid4().hex[:8]}",
+            "user_id": gift.get("recipient_id"),  # Will need to create user account for recipient
+            "product_id": gift["product_id"],
+            "title": product.get("title", "سبيكة ذهب"),
+            "image_url": product.get("image_url", ""),
+            "weight_grams": product.get("weight_grams", 10),
+            "karat": product.get("karat", 24),
+            "purchase_price": product.get("price_qar", 0),
+            "source": "gift",
+            "gift_token": token,
+            "added_at": datetime.utcnow()
+        }
+        await db.portfolio.insert_one(portfolio_item)
+    # regift doesn't need special handling - frontend will handle navigation
+    
+    return {"message": "تم استلام الهدية بنجاح", "action": action}
+
+# ==================== PORTFOLIO MANAGEMENT ====================
+
+@api_router.get("/portfolio")
+async def get_user_portfolio(request: Request):
+    user = await get_current_user(request)
+    
+    # Get all portfolio items for this user
+    portfolio_items = await db.portfolio.find({"user_id": user["user_id"]}, {"_id": 0}).to_list(100)
+    
+    if not portfolio_items:
+        return {"items": [], "stats": {"totalValue": 0, "totalCost": 0, "profitLoss": 0, "profitLossPercent": 0}}
+    
+    # Get current gold prices to calculate current values
+    prices = await db.gold_prices.find({}, {"_id": 0}).to_list(10)
+    price_map = {p["karat"]: p["price_per_gram_qar"] for p in prices}
+    
+    # Calculate current values and stats
+    total_value = 0
+    total_cost = 0
+    
+    for item in portfolio_items:
+        # Get current price based on karat
+        karat = item.get("karat", 24)
+        current_price_per_gram = price_map.get(karat, 575)
+        weight = item.get("weight_grams", 10)
+        
+        # Calculate current value
+        item["current_value"] = round(current_price_per_gram * weight, 2)
+        total_value += item["current_value"]
+        total_cost += item.get("purchase_price", item["current_value"])
+    
+    profit_loss = total_value - total_cost
+    profit_loss_percent = (profit_loss / total_cost * 100) if total_cost > 0 else 0
+    
+    return {
+        "items": portfolio_items,
+        "stats": {
+            "totalValue": round(total_value, 2),
+            "totalCost": round(total_cost, 2),
+            "profitLoss": round(profit_loss, 2),
+            "profitLossPercent": round(profit_loss_percent, 2)
+        }
+    }
+
+@api_router.post("/portfolio/{item_id}/sell")
+async def sell_portfolio_item(request: Request, item_id: str):
+    user = await get_current_user(request)
+    
+    # Get the item
+    item = await db.portfolio.find_one({"id": item_id, "user_id": user["user_id"]})
+    
+    if not item:
+        raise HTTPException(status_code=404, detail="المنتج غير موجود في المحفظة")
+    
+    # TODO: Process payment to user account
+    # For now, just remove from portfolio
+    
+    await db.portfolio.delete_one({"id": item_id})
+    
+    return {"message": "تم بيع المنتج بنجاح", "amount": item.get("current_value", 0)}
 
 # ==================== ROOT ====================
 

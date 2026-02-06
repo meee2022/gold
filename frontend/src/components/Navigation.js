@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, TrendingUp, Gift, Store, User, ShoppingCart, ShoppingBag, Bell, ChevronLeft, Palette } from "lucide-react";
+import { Home, TrendingUp, Gift, Store, User, ShoppingCart, ShoppingBag, Bell, ChevronLeft, Wallet } from "lucide-react";
 import { useAuth, apiCall } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 
@@ -21,9 +21,9 @@ export const BottomNav = () => {
   const navItems = [
     { path: "/", icon: Home, label: "الرئيسية" },
     { path: "/investment", icon: TrendingUp, label: "الاستثمار" },
+    { path: "/portfolio", icon: Wallet, label: "المحفظة" },
     { path: "/gifts", icon: Gift, label: "الهدايا" },
-    { path: "/store", icon: Store, label: "المجوهرات" },
-    { path: "/designers", icon: Palette, label: "المصممات" },
+    { path: "/store", icon: Store, label: "المتجر" },
   ];
 
   return (
