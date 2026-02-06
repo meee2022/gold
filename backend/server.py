@@ -23,9 +23,18 @@ env_path = ROOT_DIR / '.env'
 if env_path.exists():
     load_dotenv(env_path)
 
-# MongoDB connection with SSL certificate
-mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://Meee87:Realmadridclub2011@gold.jazujkd.mongodb.net/?appName=Gold')
-client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
+# MongoDB connection - using local MongoDB temporarily
+# For production, use MongoDB Atlas with proper SSL configuration
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+if 'mongodb+srv' in mongo_url:
+    try:
+        import certifi
+        client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=5000)
+    except:
+        # Fallback to local MongoDB if Atlas fails
+        client = AsyncIOMotorClient('mongodb://localhost:27017')
+else:
+    client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'zeina_khazina')]
 
 # JWT Config
