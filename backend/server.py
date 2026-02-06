@@ -23,16 +23,10 @@ env_path = ROOT_DIR / '.env'
 if env_path.exists():
     load_dotenv(env_path)
 
-# MongoDB connection - using local MongoDB temporarily
-# For production, use MongoDB Atlas with proper SSL configuration
+# MongoDB connection with SSL certificate for Atlas
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-if 'mongodb+srv' in mongo_url:
-    try:
-        import certifi
-        client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=5000)
-    except:
-        # Fallback to local MongoDB if Atlas fails
-        client = AsyncIOMotorClient('mongodb://localhost:27017')
+if 'mongodb+srv' in mongo_url or 'mongodb.net' in mongo_url:
+    client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
 else:
     client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'zeina_khazina')]
