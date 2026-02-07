@@ -25,11 +25,19 @@ if env_path.exists():
 
 # MongoDB connection with SSL certificate for Atlas
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-if 'mongodb+srv' in mongo_url or 'mongodb.net' in mongo_url:
-    client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
-else:
-    client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'zeina_khazina')]
+db_name = os.environ.get('DB_NAME', 'gold')
+
+try:
+    if 'mongodb+srv' in mongo_url or 'mongodb.net' in mongo_url:
+        client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where(), serverSelectionTimeoutMS=5000)
+    else:
+        client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+    db = client[db_name]
+except Exception as e:
+    print(f"MongoDB connection error: {e}")
+    # Fallback - will fail gracefully
+    client = None
+    db = None
 
 # JWT Config
 JWT_SECRET = os.environ.get('JWT_SECRET', 'zeina_khazina_secret_2024')
