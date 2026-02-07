@@ -293,25 +293,27 @@ async def startup_event():
         prices_count = await db.gold_prices.count_documents({})
         if prices_count == 0:
             await update_gold_prices()
-    
-    # Seed sample products if empty
-    products_count = await db.products.count_documents({})
-    if products_count == 0:
-        await seed_sample_products()
-    
-    # Seed merchants if empty
-    merchants_count = await db.merchants.count_documents({})
-    if merchants_count == 0:
-        await seed_sample_merchants()
-    
-    # Seed designers if empty
-    designers_count = await db.designers.count_documents({})
-    if designers_count == 0:
-        await seed_qatari_designers()
-    
-    # Start background task for periodic price updates
-    asyncio.create_task(periodic_price_update())
-    logger.info("Started periodic gold price updates (every 5 minutes)")
+        
+        # Seed sample products if empty
+        products_count = await db.products.count_documents({})
+        if products_count == 0:
+            await seed_sample_products()
+        
+        # Seed merchants if empty
+        merchants_count = await db.merchants.count_documents({})
+        if merchants_count == 0:
+            await seed_sample_merchants()
+        
+        # Seed designers if empty
+        designers_count = await db.designers.count_documents({})
+        if designers_count == 0:
+            await seed_qatari_designers()
+        
+        # Start background task for periodic price updates
+        asyncio.create_task(periodic_price_update())
+        logger.info("Started periodic gold price updates (every 5 minutes)")
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
 
 async def seed_sample_merchants():
     merchants = [
