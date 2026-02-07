@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Shield, User, Eye, Ban, CheckCircle } from "lucide-react";
+import { Search, Shield, User, Eye, Ban, CheckCircle, Trash2, Key } from "lucide-react";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/badge";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
 import { BottomNav, TopHeader } from "../components/Navigation";
-import { fetchUsers, updateUserRole, toggleUserBlock } from "../admin/usersApi";
+import { fetchUsers, updateUserRole, toggleUserBlock, deleteUser, resetUserPassword } from "../admin/usersApi";
 
 const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
