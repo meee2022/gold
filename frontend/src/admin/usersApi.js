@@ -127,3 +127,14 @@ export const toggleUserBlock = async (userId, isBlocked) => {
     throw error;
   }
 };
+
+// Reset user password (Admin only)
+export const resetUserPassword = async (userId, newPassword) => {
+  try {
+    const response = await apiCall("put", `/admin/users/${userId}/reset-password`, { new_password: newPassword });
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting user password:", error);
+    throw error;
+  }
+};
