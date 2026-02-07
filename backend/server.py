@@ -1781,22 +1781,6 @@ async def health():
 # Include router
 app.include_router(api_router)
 
-# CORS configuration - specific origins required when credentials=True
-allowed_origins = [
-    "https://goldqatar.netlify.app",
-    "https://zeina-khazina.preview.emergentagent.com",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=allowed_origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
