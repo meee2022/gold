@@ -62,6 +62,7 @@ app = FastAPI()
 # CORS configuration - MUST be added right after app creation
 allowed_origins = [
     "https://goldqatar.netlify.app",
+    "https://goldqatar1.netlify.app",
     "https://zeina-khazina.preview.emergentagent.com",
     "http://localhost:3000",
     "http://127.0.0.1:3000"
