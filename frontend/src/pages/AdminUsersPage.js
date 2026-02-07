@@ -292,7 +292,7 @@ const AdminUsersPage = () => {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button
                     onClick={() => navigate(`/admin/users/${user.user_id}`)}
                     variant="outline"
@@ -305,6 +305,16 @@ const AdminUsersPage = () => {
                   
                   {user.user_id !== currentUser.user_id && (
                     <>
+                      <Button
+                        onClick={() => handleResetPassword(user.user_id, user.name)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black"
+                      >
+                        <Key className="ml-1 h-4 w-4" />
+                        تغيير كلمة المرور
+                      </Button>
+                      
                       <Button
                         onClick={() => handleToggleAdmin(user.user_id, user.name, user.role)}
                         variant="outline"
@@ -331,6 +341,16 @@ const AdminUsersPage = () => {
                       >
                         <Ban className="ml-1 h-4 w-4" />
                         {user.isBlocked ? "إلغاء الحظر" : "حظر"}
+                      </Button>
+
+                      <Button
+                        onClick={() => handleDeleteUser(user.user_id, user.name)}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                      >
+                        <Trash2 className="ml-1 h-4 w-4" />
+                        حذف
                       </Button>
                     </>
                   )}
