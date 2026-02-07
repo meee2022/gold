@@ -102,6 +102,40 @@ const AdminUsersPage = () => {
     }
   };
 
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`هل أنت متأكد من حذف المستخدم "${userName}"؟ هذا الإجراء لا يمكن التراجع عنه!`)) {
+      return;
+    }
+
+    try {
+      await deleteUser(userId);
+      toast.success("تم حذف المستخدم بنجاح");
+      loadUsers();
+    } catch (error) {
+      toast.error("فشل في حذف المستخدم");
+      console.error(error);
+    }
+  };
+
+  const handleResetPassword = async (userId, userName) => {
+    const newPassword = window.prompt(`أدخل كلمة المرور الجديدة للمستخدم "${userName}":`);
+    
+    if (!newPassword) return;
+    
+    if (newPassword.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+
+    try {
+      await resetUserPassword(userId, newPassword);
+      toast.success("تم تغيير كلمة المرور بنجاح");
+    } catch (error) {
+      toast.error("فشل في تغيير كلمة المرور");
+      console.error(error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] pb-20">
