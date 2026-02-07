@@ -1425,6 +1425,27 @@ async def admin_delete_user(request: Request, user_id: str):
     
     return {"message": "تم حذف المستخدم بنجاح"}
 
+@api_router.put("/admin/users/{user_id}/reset-password")
+async def admin_reset_user_password(request: Request, user_id: str, data: dict):
+    await get_admin_user(request)
+    
+    new_password = data.get("new_password")
+    if not new_password or len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+    
+    # Hash the new password
+    password_hash = hash_password(new_password)
+    
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"password_hash": password_hash}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم تغيير كلمة المرور بنجاح"}
+
 # ==================== ADMIN SHOPS/DESIGNERS/PRODUCTS STATS ====================
 
 @api_router.get("/admin/shops/stats")
