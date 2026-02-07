@@ -181,13 +181,6 @@ const AuthPage = () => {
         </Button>
         */}
 
-        {/* Divider */}
-        <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-[#27272A]" />
-          <span className="text-[#A1A1AA] text-sm">أو</span>
-          <div className="flex-1 h-px bg-[#27272A]" />
-        </div>
-
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "register" && (
