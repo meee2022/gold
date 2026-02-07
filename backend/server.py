@@ -260,25 +260,39 @@ async def get_admin_user(request: Request) -> dict:
 
 @app.on_event("startup")
 async def startup_event():
-    # Create admin user if not exists
-    admin = await db.users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
-    if not admin:
-        admin_user = {
-            "user_id": f"user_{uuid.uuid4().hex[:12]}",
-            "name": "Admin",
-            "email": ADMIN_EMAIL,
-            "password_hash": hash_password(ADMIN_PASSWORD),
-            "role": "admin",
-            "picture": None,
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
-        await db.users.insert_one(admin_user)
-        logger.info("Admin user created")
+    # Wait for MongoDB connection
+    if db is None:
+        logger.error("MongoDB not connected!")
+        return
     
-    # Initialize gold prices if empty
-    prices_count = await db.gold_prices.count_documents({})
-    if prices_count == 0:
-        await update_gold_prices()
+    try:
+        # Test connection first
+        await client.admin.command('ping')
+        logger.info("MongoDB connected successfully")
+    except Exception as e:
+        logger.error(f"MongoDB connection failed: {e}")
+        return
+    
+    try:
+        # Create admin user if not exists
+        admin = await db.users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
+        if not admin:
+            admin_user = {
+                "user_id": f"user_{uuid.uuid4().hex[:12]}",
+                "name": "Admin",
+                "email": ADMIN_EMAIL,
+                "password_hash": hash_password(ADMIN_PASSWORD),
+                "role": "admin",
+                "picture": None,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(admin_user)
+            logger.info("Admin user created")
+        
+        # Initialize gold prices if empty
+        prices_count = await db.gold_prices.count_documents({})
+        if prices_count == 0:
+            await update_gold_prices()
     
     # Seed sample products if empty
     products_count = await db.products.count_documents({})
