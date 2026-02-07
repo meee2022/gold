@@ -164,7 +164,8 @@ const AuthPage = () => {
     // Login or Register form
     return (
       <>
-        {/* Google Login */}
+        {/* Google Login - Disabled for now */}
+        {/* 
         <Button
           onClick={loginWithGoogle}
           className="w-full bg-white hover:bg-gray-100 text-black font-medium rounded-full h-12 mb-4 flex items-center justify-center gap-3"
@@ -178,6 +179,7 @@ const AuthPage = () => {
           </svg>
           المتابعة مع Google
         </Button>
+        */}
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
