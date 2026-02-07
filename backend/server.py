@@ -50,6 +50,23 @@ last_gold_prices = {}
 price_update_subscribers = []
 
 app = FastAPI()
+
+# CORS configuration - MUST be added right after app creation
+allowed_origins = [
+    "https://goldqatar.netlify.app",
+    "https://zeina-khazina.preview.emergentagent.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_router = APIRouter(prefix="/api")
 
 # Configure logging
