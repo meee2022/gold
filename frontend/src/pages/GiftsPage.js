@@ -198,6 +198,28 @@ const GiftsPage = () => {
                 className="bg-[#0A0A0A] border-[#27272A] text-white h-12 rounded-xl text-right"
                 data-testid="amount-input"
               />
+              
+              {/* Gold Equivalent Display */}
+              {goldEquivalent && formData.amount >= 50 && (
+                <div className="mt-3 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-xl p-3" dir="rtl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Scale size={16} className="text-[#D4AF37]" />
+                    <span className="text-[#D4AF37] text-sm font-semibold">ما يعادله من الذهب</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    <div className="bg-[#0A0A0A] rounded-lg p-2">
+                      <p className="text-[#D4AF37] font-bold text-lg">{goldEquivalent.grams24k} جرام</p>
+                      <p className="text-[#A1A1AA] text-xs">ذهب عيار 24</p>
+                      <p className="text-[#666] text-xs">({goldEquivalent.price24k} ر.ق/جرام)</p>
+                    </div>
+                    <div className="bg-[#0A0A0A] rounded-lg p-2">
+                      <p className="text-[#D4AF37] font-bold text-lg">{goldEquivalent.grams21k} جرام</p>
+                      <p className="text-[#A1A1AA] text-xs">ذهب عيار 21</p>
+                      <p className="text-[#666] text-xs">({goldEquivalent.price21k} ر.ق/جرام)</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Personal Message */}
