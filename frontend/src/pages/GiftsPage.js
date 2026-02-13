@@ -18,8 +18,8 @@ const GiftsPage = () => {
     recipientName: "",
     whatsappNumber: "",
     amount: "",
-    message: "",
-    validityDays: "30"
+    occasion: "",
+    message: ""
   });
   const [loading, setLoading] = useState(false);
   const [sentVoucher, setSentVoucher] = useState(null);
