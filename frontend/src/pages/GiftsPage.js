@@ -45,7 +45,7 @@ const GiftsPage = () => {
     setLoading(true);
     try {
       // Create gift voucher
-      await apiCall("post", "/gifts/voucher", {
+      const response = await apiCall("post", "/gifts/voucher", {
         recipient_name: formData.recipientName,
         whatsapp_number: formData.whatsappNumber,
         amount_qar: parseFloat(formData.amount),
@@ -53,6 +53,7 @@ const GiftsPage = () => {
         validity_days: parseInt(formData.validityDays)
       });
       
+      setSentVoucher(response.voucher);
       toast.success("تم إرسال القسيمة بنجاح!");
       setFormData({
         recipientName: "",
