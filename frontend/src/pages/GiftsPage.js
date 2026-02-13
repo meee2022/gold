@@ -71,7 +71,7 @@ const GiftsPage = () => {
       return;
     }
 
-    if (!formData.recipientName || !formData.whatsappNumber || !formData.amount || !formData.occasion) {
+    if (!formData.recipientName || !formData.whatsappNumber || !formData.amount) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
