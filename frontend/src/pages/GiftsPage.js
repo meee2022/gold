@@ -102,14 +102,12 @@ const GiftsPage = () => {
       <div className="px-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
         
         {/* Gift Card Image */}
-        <div className="bg-[#121212] border border-[#27272A] rounded-2xl p-8 flex items-center justify-center">
+        <div className="bg-[#121212] border border-[#27272A] rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
           <div className="relative">
-            <div className="w-80 h-52 bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-2xl border-2 border-[#D4AF37]/40 shadow-2xl transform rotate-[-3deg] flex items-center justify-center">
-              <div className="text-center p-4">
-                <img src="/logo.png" alt="زينة وخزينة" className="h-28 w-28 mx-auto mb-3 object-contain" />
-                <p className="text-[#D4AF37] text-base font-bold font-['Cairo']">قسيمة هدية</p>
-                <p className="text-[#A1A1AA] text-xs mt-1">زينة وخزينة</p>
-              </div>
+            <div className="w-72 h-48 bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-2xl border-2 border-[#D4AF37]/40 shadow-2xl transform rotate-[-3deg] flex flex-col items-center justify-center p-4">
+              <img src="/logo.png" alt="زينة وخزينة" className="h-32 w-auto max-w-full object-contain mb-2" />
+              <p className="text-[#D4AF37] text-lg font-bold font-['Cairo']">قسيمة هدية</p>
+              <p className="text-[#A1A1AA] text-sm mt-1">زينة وخزينة</p>
             </div>
             {/* Decorative elements */}
             <div className="absolute -top-3 -right-3 w-10 h-10 bg-[#D4AF37] rounded-full flex items-center justify-center shadow-lg">
