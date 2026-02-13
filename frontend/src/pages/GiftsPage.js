@@ -219,6 +219,36 @@ const GiftsPage = () => {
               </p>
             </div>
           </form>
+
+          {/* Success Message - Show after voucher is sent */}
+          {sentVoucher && (
+            <div className="mt-6 bg-green-900/30 border border-green-500/50 rounded-xl p-5" data-testid="voucher-success">
+              <div className="flex items-center gap-3 mb-4">
+                <Check size={24} className="text-green-400" />
+                <h3 className="text-lg font-bold text-green-400 font-['Cairo']">تم إرسال القسيمة بنجاح!</h3>
+              </div>
+              <div className="space-y-3 text-right">
+                <div className="flex justify-between items-center">
+                  <span className="text-green-300 font-mono text-lg">{sentVoucher.voucher_code}</span>
+                  <span className="text-[#A1A1AA] text-sm">كود القسيمة:</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white">{sentVoucher.recipient_name}</span>
+                  <span className="text-[#A1A1AA] text-sm">المُهدى إليه:</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#D4AF37] font-bold">{sentVoucher.amount_qar} ر.ق</span>
+                  <span className="text-[#A1A1AA] text-sm">القيمة:</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSentVoucher(null)}
+                className="w-full mt-4 bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 text-[#D4AF37] py-2 rounded-lg transition-colors"
+              >
+                إرسال قسيمة أخرى
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
