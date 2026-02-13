@@ -252,14 +252,14 @@ const GiftsPage = () => {
       </div>
 
       {/* Features Section */}
-      <div className="px-4 mt-6">
+      <div className="px-4 mt-6" dir="rtl">
         <div className="bg-[#121212] border border-[#27272A] rounded-2xl p-5">
           <h3 className="text-lg font-bold text-[#D4AF37] font-['Cairo'] mb-4 text-right">مميزات القسائم الرقمية</h3>
           <div className="space-y-3">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 justify-end">
-                <span className="text-[#A1A1AA] text-sm">{feature.text}</span>
-                <div className="w-2 h-2 bg-[#D4AF37] rounded-full" />
+              <div key={index} className="flex items-center gap-3 flex-row-reverse justify-end">
+                <div className="w-2 h-2 bg-[#D4AF37] rounded-full flex-shrink-0" />
+                <span className="text-[#A1A1AA] text-sm text-right">{feature.text}</span>
               </div>
             ))}
           </div>
@@ -267,7 +267,7 @@ const GiftsPage = () => {
       </div>
 
       {/* Occasions Section */}
-      <div className="px-4 mt-4 mb-4">
+      <div className="px-4 mt-4 mb-4" dir="rtl">
         <div className="bg-[#121212] border border-[#27272A] rounded-2xl p-5">
           <h3 className="text-lg font-bold text-[#D4AF37] font-['Cairo'] mb-4 text-right">مناسبات مثالية</h3>
           <div className="grid grid-cols-2 gap-3">
