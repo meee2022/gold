@@ -34,6 +34,30 @@ const ProfilePage = () => {
     toast.success("تم تسجيل الخروج");
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "⚠️ تحذير: هل أنت متأكد من حذف حسابك نهائياً؟\n\nسيتم حذف جميع بياناتك بما في ذلك:\n- الطلبات\n- المحفظة\n- الإشعارات\n\nهذا الإجراء لا يمكن التراجع عنه!"
+    );
+    
+    if (!confirmed) return;
+    
+    const doubleConfirm = window.confirm(
+      "هل أنت متأكد تماماً؟ اضغط موافق للحذف النهائي."
+    );
+    
+    if (!doubleConfirm) return;
+    
+    try {
+      await apiCall("delete", "/auth/delete-account");
+      await logout();
+      navigate("/");
+      toast.success("تم حذف حسابك بنجاح");
+    } catch (error) {
+      toast.error("فشل في حذف الحساب");
+      console.error(error);
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-[#050505] pb-20">
