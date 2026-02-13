@@ -1766,6 +1766,7 @@ async def create_gift_voucher(request: Request, voucher: GiftVoucherCreate):
         "recipient_name": voucher.recipient_name,
         "whatsapp_number": voucher.whatsapp_number,
         "amount_qar": voucher.amount_qar,
+        "occasion": voucher.occasion or "",
         "message": voucher.message or "",
         "validity_days": voucher.validity_days,
         "status": "active",  # active, redeemed, expired
