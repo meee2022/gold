@@ -274,6 +274,7 @@ const AuthPage = () => {
       <div className="flex-1 px-6 py-8">
         {/* Logo */}
         <div className="text-center mb-8">
+          <img src="/logo.png" alt="زينة وخزينة" className="h-24 w-24 mx-auto mb-4 object-contain" />
           <h1 className="text-3xl font-bold text-[#D4AF37] font-['Cairo']">زينة وخزينة</h1>
           <p className="text-[#A1A1AA] text-sm mt-2">ZEINA & KHAZINA</p>
         </div>
