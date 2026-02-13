@@ -88,7 +88,7 @@ export const TopHeader = ({ title, showBack = false, showCart = true, showNotifi
       </div>
       
       <div className="flex items-center gap-3">
-        <img src="/logo.png" alt="زينة وخزينة" className="h-12 w-12 object-contain" />
+        <img src="/logo.png" alt="زينة وخزينة" className="h-20 w-20 object-contain" />
         <h1 className="text-lg font-bold text-[#D4AF37] font-['Cairo']" data-testid="header-title">
           {title || "زينة وخزينة"}
         </h1>
