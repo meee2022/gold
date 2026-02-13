@@ -362,16 +362,32 @@ function InvestmentPage() {
         <h3 className="text-lg font-bold text-white font-['Cairo'] mb-3">السبائك المتوفرة</h3>
         <div className="space-y-3">
           {filteredBars.map((bar) => (
-            <div key={bar.product_id} className="flex gap-4 p-4 bg-[#121212] border border-[#27272A] rounded-xl" data-testid={`bar-${bar.product_id}`}>
-              <img src={bar.image_url} alt={bar.title} className="w-20 h-20 rounded-lg object-cover" />
-              <div className="flex-1">
-                <h4 className="text-white font-semibold">{bar.title}</h4>
-                <p className="text-[#A1A1AA] text-sm">النقاء: {bar.karat === 24 ? "999.9" : bar.karat}</p>
-                <p className="text-[#D4AF37] font-bold mt-1">{bar.price_qar?.toLocaleString()} ر.ق</p>
+            <div key={bar.product_id} className="p-4 bg-[#121212] border border-[#27272A] rounded-xl" data-testid={`bar-${bar.product_id}`}>
+              <div className="flex gap-4">
+                <img src={bar.image_url} alt={bar.title} className="w-20 h-20 rounded-lg object-cover" />
+                <div className="flex-1">
+                  <h4 className="text-white font-semibold">{bar.title}</h4>
+                  <p className="text-[#A1A1AA] text-sm">النقاء: {bar.karat === 24 ? "999.9" : bar.karat}</p>
+                  <p className="text-[#D4AF37] font-bold mt-1">{bar.price_qar?.toLocaleString()} ر.ق</p>
+                </div>
+                <Button onClick={() => handleAddBarToCart(bar)} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center text-sm px-4" data-testid={`buy-bar-${bar.product_id}`}>
+                  اشترِ الآن
+                </Button>
               </div>
-              <Button onClick={() => handleAddBarToCart(bar)} className="bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-full self-center text-sm px-4" data-testid={`buy-bar-${bar.product_id}`}>
-                اشترِ الآن
-              </Button>
+              {/* Provider Info */}
+              <div className="mt-3 pt-3 border-t border-[#27272A] flex items-center justify-between" dir="rtl">
+                <div className="flex items-center gap-2">
+                  <img src="/logo.png" alt="المزود" className="w-8 h-8 object-contain" />
+                  <div>
+                    <p className="text-[#A1A1AA] text-xs">مزود السبيكة</p>
+                    <p className="text-white text-sm font-semibold">{bar.merchant_name || "زينة وخزينة للذهب"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">موثق ✓</span>
+                  <span className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs px-2 py-0.5 rounded-full">LBMA</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
