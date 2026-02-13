@@ -689,6 +689,27 @@ async def logout(response: Response):
     response.delete_cookie(key="session_token", path="/")
     return {"message": "تم تسجيل الخروج بنجاح"}
 
+@api_router.delete("/auth/delete-account")
+async def delete_account(request: Request):
+    """Delete user account permanently"""
+    user = await get_current_user(request)
+    user_id = user["user_id"]
+    
+    # Delete user's data from all collections
+    await db.cart.delete_many({"user_id": user_id})
+    await db.orders.delete_many({"user_id": user_id})
+    await db.wallets.delete_many({"user_id": user_id})
+    await db.notifications.delete_many({"user_id": user_id})
+    await db.price_alerts.delete_many({"user_id": user_id})
+    
+    # Delete the user
+    result = await db.users.delete_one({"user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    return {"message": "تم حذف الحساب بنجاح"}
+
 # ==================== PASSWORD RESET ====================
 
 @api_router.post("/auth/forgot-password")
