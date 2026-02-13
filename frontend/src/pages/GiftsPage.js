@@ -383,12 +383,6 @@ const GiftsPage = () => {
               </button>
             </div>
           )}
-                className="w-full mt-4 text-[#A1A1AA] hover:text-white text-sm py-2 transition-colors"
-              >
-                إرسال قسيمة أخرى
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
