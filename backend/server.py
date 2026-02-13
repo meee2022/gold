@@ -1736,6 +1736,166 @@ async def send_gift(request: Request, gift_data: dict):
     
     return {"message": "تم إرسال الهدية بنجاح", "gift_token": gift_token}
 
+@api_router.post("/gifts/voucher")
+async def create_gift_voucher(request: Request, voucher: GiftVoucherCreate):
+    """إنشاء قسيمة هدية رقمية"""
+    user = await get_current_user(request)
+    
+    # Validate amount
+    if voucher.amount_qar < 50:
+        raise HTTPException(status_code=400, detail="الحد الأدنى للقسيمة 50 ريال قطري")
+    
+    if voucher.amount_qar > 50000:
+        raise HTTPException(status_code=400, detail="الحد الأقصى للقسيمة 50,000 ريال قطري")
+    
+    # Generate unique voucher code (8 characters)
+    voucher_code = f"ZK{secrets.token_hex(4).upper()}"
+    voucher_id = f"voucher_{uuid.uuid4().hex[:12]}"
+    
+    # Calculate expiry date
+    created_at = datetime.now(timezone.utc)
+    expires_at = created_at + timedelta(days=voucher.validity_days)
+    
+    voucher_doc = {
+        "voucher_id": voucher_id,
+        "voucher_code": voucher_code,
+        "sender_id": user["user_id"],
+        "sender_name": user["name"],
+        "sender_email": user["email"],
+        "recipient_name": voucher.recipient_name,
+        "whatsapp_number": voucher.whatsapp_number,
+        "amount_qar": voucher.amount_qar,
+        "message": voucher.message or "",
+        "validity_days": voucher.validity_days,
+        "status": "active",  # active, redeemed, expired
+        "created_at": created_at.isoformat(),
+        "expires_at": expires_at.isoformat(),
+        "redeemed_at": None,
+        "redeemed_by": None
+    }
+    
+    await db.gift_vouchers.insert_one(voucher_doc)
+    
+    # Create notification for sender
+    notification = {
+        "notification_id": f"notif_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "type": "voucher_sent",
+        "title": "تم إرسال القسيمة",
+        "message": f"تم إرسال قسيمة بقيمة {voucher.amount_qar} ر.ق إلى {voucher.recipient_name}",
+        "read": False,
+        "created_at": created_at.isoformat()
+    }
+    await db.notifications.insert_one(notification)
+    
+    # TODO: Send WhatsApp message to recipient with voucher details
+    # whatsapp_link = f"https://wa.me/{voucher.whatsapp_number.replace('+', '')}?text=..."
+    
+    return {
+        "message": "تم إرسال القسيمة بنجاح",
+        "voucher": {
+            "voucher_id": voucher_id,
+            "voucher_code": voucher_code,
+            "recipient_name": voucher.recipient_name,
+            "amount_qar": voucher.amount_qar,
+            "expires_at": expires_at.isoformat()
+        }
+    }
+
+@api_router.get("/gifts/vouchers/sent")
+async def get_sent_vouchers(request: Request):
+    """الحصول على القسائم المرسلة من المستخدم"""
+    user = await get_current_user(request)
+    vouchers = await db.gift_vouchers.find(
+        {"sender_id": user["user_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return vouchers
+
+@api_router.get("/gifts/voucher/{voucher_code}")
+async def get_voucher_by_code(voucher_code: str):
+    """الحصول على تفاصيل القسيمة بالكود"""
+    voucher = await db.gift_vouchers.find_one(
+        {"voucher_code": voucher_code},
+        {"_id": 0}
+    )
+    
+    if not voucher:
+        raise HTTPException(status_code=404, detail="القسيمة غير موجودة")
+    
+    # Check if expired
+    expires_at = datetime.fromisoformat(voucher["expires_at"])
+    if datetime.now(timezone.utc) > expires_at and voucher["status"] == "active":
+        await db.gift_vouchers.update_one(
+            {"voucher_code": voucher_code},
+            {"$set": {"status": "expired"}}
+        )
+        voucher["status"] = "expired"
+    
+    return voucher
+
+@api_router.post("/gifts/voucher/{voucher_code}/redeem")
+async def redeem_voucher(request: Request, voucher_code: str):
+    """استخدام القسيمة"""
+    user = await get_current_user(request)
+    
+    voucher = await db.gift_vouchers.find_one({"voucher_code": voucher_code})
+    
+    if not voucher:
+        raise HTTPException(status_code=404, detail="القسيمة غير موجودة")
+    
+    if voucher["status"] == "redeemed":
+        raise HTTPException(status_code=400, detail="تم استخدام هذه القسيمة مسبقاً")
+    
+    # Check expiry
+    expires_at = datetime.fromisoformat(voucher["expires_at"])
+    if datetime.now(timezone.utc) > expires_at:
+        await db.gift_vouchers.update_one(
+            {"voucher_code": voucher_code},
+            {"$set": {"status": "expired"}}
+        )
+        raise HTTPException(status_code=400, detail="انتهت صلاحية القسيمة")
+    
+    # Update voucher status
+    redeemed_at = datetime.now(timezone.utc)
+    await db.gift_vouchers.update_one(
+        {"voucher_code": voucher_code},
+        {
+            "$set": {
+                "status": "redeemed",
+                "redeemed_at": redeemed_at.isoformat(),
+                "redeemed_by": user["user_id"]
+            }
+        }
+    )
+    
+    # Add amount to user's wallet as credit
+    await db.wallets.update_one(
+        {"user_id": user["user_id"]},
+        {
+            "$inc": {"cash_qar": voucher["amount_qar"]},
+            "$set": {"updated_at": redeemed_at.isoformat()}
+        },
+        upsert=True
+    )
+    
+    # Create notification for recipient
+    notification = {
+        "notification_id": f"notif_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "type": "voucher_redeemed",
+        "title": "تم استلام القسيمة",
+        "message": f"تم إضافة {voucher['amount_qar']} ر.ق إلى رصيدك من قسيمة {voucher['sender_name']}",
+        "read": False,
+        "created_at": redeemed_at.isoformat()
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "message": "تم استخدام القسيمة بنجاح",
+        "amount_added": voucher["amount_qar"]
+    }
+
 @api_router.get("/gifts/{token}")
 async def get_gift_by_token(token: str):
     gift = await db.gifts.find_one({"gift_token": token}, {"_id": 0})
