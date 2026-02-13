@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, ChevronLeft, Info, Shield } from "lucide-react";
+import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, ChevronLeft, Info, Shield, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
