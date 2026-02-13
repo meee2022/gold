@@ -88,8 +88,17 @@ const GiftsPage = () => {
         validity_days: 365 // صالحة لمدة سنة تلقائياً
       });
       
-      setSentVoucher(response.voucher);
-      toast.success("تم إرسال القسيمة بنجاح!");
+      // Save voucher with additional info for display
+      setSentVoucher({
+        ...response.voucher,
+        occasion: formData.occasion,
+        message: formData.message,
+        whatsapp_number: formData.whatsappNumber
+      });
+      
+      toast.success("تم إنشاء القسيمة بنجاح!");
+      
+      // Clear form
       setFormData({
         recipientName: "",
         whatsappNumber: "",
@@ -97,6 +106,12 @@ const GiftsPage = () => {
         occasion: "",
         message: ""
       });
+      
+      // Scroll to show the success message
+      setTimeout(() => {
+        document.getElementById('voucher-success')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      
     } catch (error) {
       toast.error("فشل في إرسال القسيمة");
       console.error(error);
