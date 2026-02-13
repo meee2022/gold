@@ -43,12 +43,15 @@ const GiftsPage = () => {
     if (!amount || !goldPrices.length) return null;
     const price24k = goldPrices.find(p => p.karat === 24)?.price_per_gram_qar;
     const price21k = goldPrices.find(p => p.karat === 21)?.price_per_gram_qar;
-    if (!price24k || !price21k) return null;
+    const price18k = goldPrices.find(p => p.karat === 18)?.price_per_gram_qar;
+    if (!price24k || !price21k || !price18k) return null;
     return {
       grams24k: (parseFloat(amount) / price24k).toFixed(2),
       grams21k: (parseFloat(amount) / price21k).toFixed(2),
+      grams18k: (parseFloat(amount) / price18k).toFixed(2),
       price24k: price24k.toFixed(2),
-      price21k: price21k.toFixed(2)
+      price21k: price21k.toFixed(2),
+      price18k: price18k.toFixed(2)
     };
   };
 
