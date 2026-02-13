@@ -264,7 +264,6 @@ const GiftsPage = () => {
                 data-testid="message-input"
               />
             </div>
-            </div>
 
             {/* Submit Button */}
             <Button
