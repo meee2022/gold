@@ -335,23 +335,34 @@ const GiftsPage = () => {
                 </div>
               </div>
 
-              {/* Card Link */}
-              <div className="bg-[#1A1A1A] rounded-xl p-4 mb-4 border border-[#27272A]">
-                <p className="text-[#A1A1AA] text-sm mb-2 text-right">رابط البطاقة:</p>
-                <div className="flex items-center gap-2 bg-[#0A0A0A] rounded-lg p-3">
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(`${window.location.origin}/gift-card/${sentVoucher.voucher_code}`);
-                      toast.success("تم نسخ الرابط!");
-                    }}
-                    className="text-[#D4AF37] hover:text-[#F4C430] transition-colors"
-                  >
-                    <Copy size={18} />
-                  </button>
-                  <span className="text-[#A1A1AA] text-xs flex-1 text-left truncate" dir="ltr">
+              {/* Card Link - Full Display */}
+              <div className="bg-[#1A1A1A] rounded-xl p-4 mb-4 border border-[#D4AF37]/30">
+                <p className="text-[#D4AF37] text-sm mb-3 text-right font-semibold">📎 رابط البطاقة (انسخه وأرسله للمستلم):</p>
+                <div className="bg-[#0A0A0A] rounded-lg p-3 mb-3">
+                  <p className="text-[#A1A1AA] text-sm break-all text-left" dir="ltr">
                     {window.location.origin}/gift-card/{sentVoucher.voucher_code}
-                  </span>
+                  </p>
                 </div>
+                <Button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/gift-card/${sentVoucher.voucher_code}`);
+                    toast.success("تم نسخ الرابط!");
+                  }}
+                  className="w-full bg-[#27272A] hover:bg-[#3A3A3A] text-white rounded-lg h-10 flex items-center justify-center gap-2"
+                >
+                  <Copy size={16} />
+                  نسخ الرابط
+                </Button>
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+                <p className="text-yellow-400 text-sm text-right font-semibold mb-2">📱 طريقة الإرسال:</p>
+                <ol className="text-[#A1A1AA] text-sm text-right space-y-1 list-decimal list-inside" dir="rtl">
+                  <li>اضغط على "فتح واتساب" أدناه</li>
+                  <li>سيفتح واتساب مع رسالة جاهزة</li>
+                  <li>اضغط إرسال في واتساب</li>
+                </ol>
               </div>
 
               {/* Share Buttons */}
@@ -365,7 +376,7 @@ const GiftsPage = () => {
                   className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-xl h-14 flex items-center justify-center gap-3 text-lg"
                 >
                   <Smartphone size={24} />
-                  إرسال البطاقة عبر واتساب
+                  فتح واتساب لإرسال البطاقة
                 </Button>
                 
                 <Button
@@ -373,7 +384,7 @@ const GiftsPage = () => {
                   className="w-full bg-[#D4AF37] hover:bg-[#F4C430] text-black font-bold rounded-xl h-12 flex items-center justify-center gap-2"
                 >
                   <Gift size={20} />
-                  معاينة البطاقة
+                  معاينة البطاقة قبل الإرسال
                 </Button>
               </div>
 
