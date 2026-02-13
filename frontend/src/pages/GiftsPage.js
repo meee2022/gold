@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Gift, Send, MessageSquare, Clock, Shield, Smartphone, GraduationCap, Heart, PartyPopper, Star, Check } from "lucide-react";
+import axios from "axios";
+import { Gift, Send, MessageSquare, Clock, Shield, Smartphone, GraduationCap, Heart, PartyPopper, Star, Check, Scale } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { toast } from "sonner";
-import { useAuth, apiCall } from "../context/AuthContext";
+import { useAuth, apiCall, API } from "../context/AuthContext";
 import { BottomNav, TopHeader } from "../components/Navigation";
 
 const GiftsPage = () => {
@@ -22,6 +23,36 @@ const GiftsPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [sentVoucher, setSentVoucher] = useState(null);
+  const [goldPrices, setGoldPrices] = useState([]);
+
+  // Fetch gold prices
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const res = await axios.get(`${API}/gold-prices`);
+        setGoldPrices(res.data);
+      } catch (error) {
+        console.error("Error fetching gold prices:", error);
+      }
+    };
+    fetchPrices();
+  }, []);
+
+  // Calculate gold equivalent
+  const getGoldEquivalent = (amount) => {
+    if (!amount || !goldPrices.length) return null;
+    const price24k = goldPrices.find(p => p.karat === 24)?.price_per_gram_qar;
+    const price21k = goldPrices.find(p => p.karat === 21)?.price_per_gram_qar;
+    if (!price24k || !price21k) return null;
+    return {
+      grams24k: (parseFloat(amount) / price24k).toFixed(2),
+      grams21k: (parseFloat(amount) / price21k).toFixed(2),
+      price24k: price24k.toFixed(2),
+      price21k: price21k.toFixed(2)
+    };
+  };
+
+  const goldEquivalent = getGoldEquivalent(formData.amount);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
