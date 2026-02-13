@@ -36,12 +36,7 @@ const AboutPage = () => {
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-[#8B7355]/20 to-transparent" />
           <div className="relative text-center">
             {/* Logo */}
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#D4AF37] flex items-center justify-center">
-              <svg viewBox="0 0 100 100" className="w-12 h-12 text-black">
-                <polygon points="50,15 85,50 50,85 15,50" fill="currentColor" />
-                <polygon points="50,25 75,50 50,75 25,50" fill="#1A1A0F" />
-              </svg>
-            </div>
+            <img src="/logo.png" alt="زينة وخزينة" className="w-24 h-24 mx-auto mb-4 object-contain" />
             <h2 className="text-[#D4AF37] font-bold text-xl font-['Cairo'] tracking-wide">ZEINA & KHAZINA</h2>
           </div>
         </div>
