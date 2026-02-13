@@ -215,8 +215,9 @@ class GiftVoucherCreate(BaseModel):
     recipient_name: str
     whatsapp_number: str
     amount_qar: float
+    occasion: Optional[str] = ""
     message: Optional[str] = ""
-    validity_days: int = 30
+    validity_days: int = 365
 
 class GiftVoucherResponse(BaseModel):
     voucher_id: str
