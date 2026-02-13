@@ -63,7 +63,7 @@ app = FastAPI()
 allowed_origins = [
     "https://goldqatar.netlify.app",
     "https://goldqatar1.netlify.app",
-    "https://zeina-khazina.preview.emergentagent.com",
+    "https://arabgoldbazaar.preview.emergentagent.com",
     "http://localhost:3000",
     "http://127.0.0.1:3000"
 ]

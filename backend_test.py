@@ -11,7 +11,7 @@ from datetime import datetime
 
 class ZeinaKhazinaAPITester:
     def __init__(self):
-        self.base_url = "https://zeina-khazina.preview.emergentagent.com/api"
+        self.base_url = "https://arabgoldbazaar.preview.emergentagent.com/api"
         self.token = None
         self.admin_token = None
         self.tests_run = 0
