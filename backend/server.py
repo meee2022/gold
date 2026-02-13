@@ -211,6 +211,27 @@ class RoleUpdate(BaseModel):
 class BlockUpdate(BaseModel):
     isBlocked: bool
 
+class GiftVoucherCreate(BaseModel):
+    recipient_name: str
+    whatsapp_number: str
+    amount_qar: float
+    message: Optional[str] = ""
+    validity_days: int = 30
+
+class GiftVoucherResponse(BaseModel):
+    voucher_id: str
+    voucher_code: str
+    sender_id: str
+    sender_name: str
+    recipient_name: str
+    whatsapp_number: str
+    amount_qar: float
+    message: str
+    validity_days: int
+    status: str
+    created_at: str
+    expires_at: str
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
