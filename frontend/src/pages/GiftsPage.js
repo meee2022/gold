@@ -71,7 +71,7 @@ const GiftsPage = () => {
       return;
     }
 
-    if (!formData.recipientName || !formData.whatsappNumber || !formData.amount) {
+    if (!formData.recipientName || !formData.whatsappNumber || !formData.amount || !formData.occasion) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
@@ -83,8 +83,9 @@ const GiftsPage = () => {
         recipient_name: formData.recipientName,
         whatsapp_number: formData.whatsappNumber,
         amount_qar: parseFloat(formData.amount),
+        occasion: formData.occasion,
         message: formData.message,
-        validity_days: parseInt(formData.validityDays)
+        validity_days: 365 // صالحة لمدة سنة تلقائياً
       });
       
       setSentVoucher(response.voucher);
@@ -93,8 +94,8 @@ const GiftsPage = () => {
         recipientName: "",
         whatsappNumber: "",
         amount: "",
-        message: "",
-        validityDays: "30"
+        occasion: "",
+        message: ""
       });
     } catch (error) {
       toast.error("فشل في إرسال القسيمة");
