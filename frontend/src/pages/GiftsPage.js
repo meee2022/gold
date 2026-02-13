@@ -257,9 +257,9 @@ const GiftsPage = () => {
           <h3 className="text-lg font-bold text-[#D4AF37] font-['Cairo'] mb-4 text-right">مميزات القسائم الرقمية</h3>
           <div className="space-y-3">
             {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3 flex-row-reverse justify-end">
+              <div key={index} className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-[#D4AF37] rounded-full flex-shrink-0" />
-                <span className="text-[#A1A1AA] text-sm text-right">{feature.text}</span>
+                <span className="text-[#A1A1AA] text-sm">{feature.text}</span>
               </div>
             ))}
           </div>
@@ -272,9 +272,9 @@ const GiftsPage = () => {
           <h3 className="text-lg font-bold text-[#D4AF37] font-['Cairo'] mb-4 text-right">مناسبات مثالية</h3>
           <div className="grid grid-cols-2 gap-3">
             {occasions.map((occasion, index) => (
-              <div key={index} className="flex items-center gap-2 flex-row-reverse justify-end">
+              <div key={index} className="flex items-center gap-2">
                 <occasion.icon size={18} className={occasion.color} />
-                <span className="text-[#A1A1AA] text-sm text-right">{occasion.text}</span>
+                <span className="text-[#A1A1AA] text-sm">{occasion.text}</span>
               </div>
             ))}
           </div>
