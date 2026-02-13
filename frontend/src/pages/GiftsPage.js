@@ -280,35 +280,70 @@ const GiftsPage = () => {
             <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-xl p-3 flex items-center gap-2">
               <Smartphone size={18} className="text-[#D4AF37] flex-shrink-0" />
               <p className="text-[#D4AF37] text-xs text-right">
-                سيتم إرسال القسيمة مباشرة عبر واتساب للمستلم مع رسالتك الشخصية
+                سيتم إنشاء بطاقة هدية جميلة يمكنك مشاركتها عبر واتساب
               </p>
             </div>
           </form>
 
           {/* Success Message - Show after voucher is sent */}
           {sentVoucher && (
-            <div className="mt-6 bg-green-900/30 border border-green-500/50 rounded-xl p-5" data-testid="voucher-success">
+            <div className="mt-6 bg-gradient-to-br from-green-900/30 to-[#0A0A0A] border border-green-500/50 rounded-xl p-5" data-testid="voucher-success">
               <div className="flex items-center gap-3 mb-4">
                 <Check size={24} className="text-green-400" />
-                <h3 className="text-lg font-bold text-green-400 font-['Cairo']">تم إرسال القسيمة بنجاح!</h3>
+                <h3 className="text-lg font-bold text-green-400 font-['Cairo']">تم إنشاء القسيمة بنجاح!</h3>
               </div>
-              <div className="space-y-3 text-right">
-                <div className="flex justify-between items-center">
-                  <span className="text-green-300 font-mono text-lg">{sentVoucher.voucher_code}</span>
-                  <span className="text-[#A1A1AA] text-sm">كود القسيمة:</span>
+              
+              {/* Gift Card Preview */}
+              <div className="bg-[#0A0A0A] rounded-xl p-4 mb-4 border border-[#27272A]">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="/logo.png" alt="زينة وخزينة" className="h-12 w-12 object-contain" />
+                  <div>
+                    <p className="text-[#D4AF37] font-bold">قسيمة هدية</p>
+                    <p className="text-[#A1A1AA] text-xs">زينة وخزينة للذهب</p>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white">{sentVoucher.recipient_name}</span>
-                  <span className="text-[#A1A1AA] text-sm">المُهدى إليه:</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[#D4AF37] font-bold">{sentVoucher.amount_qar} ر.ق</span>
-                  <span className="text-[#A1A1AA] text-sm">القيمة:</span>
+                <div className="space-y-2 text-right text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-white">{sentVoucher.recipient_name}</span>
+                    <span className="text-[#A1A1AA]">إلى:</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#D4AF37] font-bold text-lg">{sentVoucher.amount_qar} ر.ق</span>
+                    <span className="text-[#A1A1AA]">القيمة:</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-[#27272A]">
+                    <span className="text-green-400 font-mono">{sentVoucher.voucher_code}</span>
+                    <span className="text-[#A1A1AA]">الكود:</span>
+                  </div>
                 </div>
               </div>
+
+              {/* Share Buttons */}
+              <div className="space-y-2">
+                <Button
+                  onClick={() => {
+                    const cardUrl = `${window.location.origin}/gift-card/${sentVoucher.voucher_code}`;
+                    const message = `🎁 لديك هدية!\n💰 القيمة: ${sentVoucher.amount_qar} ر.ق\n🔗 شاهد بطاقة الهدية:\n${cardUrl}`;
+                    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+                  }}
+                  className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold rounded-xl h-12 flex items-center justify-center gap-2"
+                >
+                  <Smartphone size={20} />
+                  إرسال البطاقة عبر واتساب
+                </Button>
+                
+                <Button
+                  onClick={() => window.open(`/gift-card/${sentVoucher.voucher_code}`, '_blank')}
+                  className="w-full bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 text-[#D4AF37] font-bold rounded-xl h-10 flex items-center justify-center gap-2"
+                >
+                  <Gift size={18} />
+                  معاينة البطاقة
+                </Button>
+              </div>
+
               <button 
                 onClick={() => setSentVoucher(null)}
-                className="w-full mt-4 bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 text-[#D4AF37] py-2 rounded-lg transition-colors"
+                className="w-full mt-4 text-[#A1A1AA] hover:text-white text-sm py-2 transition-colors"
               >
                 إرسال قسيمة أخرى
               </button>
