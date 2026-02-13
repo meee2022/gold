@@ -209,16 +209,21 @@ const GiftsPage = () => {
                     <Scale size={16} className="text-[#D4AF37]" />
                     <span className="text-[#D4AF37] text-sm font-semibold">ما يعادله من الذهب</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-[#0A0A0A] rounded-lg p-2">
-                      <p className="text-[#D4AF37] font-bold text-lg">{goldEquivalent.grams24k} جرام</p>
-                      <p className="text-[#A1A1AA] text-xs">ذهب عيار 24</p>
-                      <p className="text-[#666] text-xs">({goldEquivalent.price24k} ر.ق/جرام)</p>
+                      <p className="text-[#D4AF37] font-bold text-base">{goldEquivalent.grams24k} جرام</p>
+                      <p className="text-[#A1A1AA] text-xs">عيار 24</p>
+                      <p className="text-[#666] text-[10px]">({goldEquivalent.price24k} ر.ق)</p>
                     </div>
                     <div className="bg-[#0A0A0A] rounded-lg p-2">
-                      <p className="text-[#D4AF37] font-bold text-lg">{goldEquivalent.grams21k} جرام</p>
-                      <p className="text-[#A1A1AA] text-xs">ذهب عيار 21</p>
-                      <p className="text-[#666] text-xs">({goldEquivalent.price21k} ر.ق/جرام)</p>
+                      <p className="text-[#D4AF37] font-bold text-base">{goldEquivalent.grams21k} جرام</p>
+                      <p className="text-[#A1A1AA] text-xs">عيار 21</p>
+                      <p className="text-[#666] text-[10px]">({goldEquivalent.price21k} ر.ق)</p>
+                    </div>
+                    <div className="bg-[#0A0A0A] rounded-lg p-2">
+                      <p className="text-[#D4AF37] font-bold text-base">{goldEquivalent.grams18k} جرام</p>
+                      <p className="text-[#A1A1AA] text-xs">عيار 18</p>
+                      <p className="text-[#666] text-[10px]">({goldEquivalent.price18k} ر.ق)</p>
                     </div>
                   </div>
                 </div>
