@@ -56,6 +56,7 @@ function AppRouter() {
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/gift-card/:voucherCode" element={<GiftCardPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/shops" element={<AdminShopsPage />} />
       <Route path="/admin/shops/new" element={<AdminShopFormPage />} />
