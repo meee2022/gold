@@ -162,6 +162,22 @@ const ProfilePage = () => {
         </Button>
       </div>
 
+      {/* Delete Account */}
+      <div className="px-4 pb-4">
+        <Button
+          onClick={handleDeleteAccount}
+          variant="outline"
+          className="w-full border-red-700 text-red-700 hover:bg-red-700 hover:text-white rounded-xl h-12"
+          data-testid="delete-account-btn"
+        >
+          <Trash2 className="ml-2" />
+          حذف الحساب نهائياً
+        </Button>
+        <p className="text-[#666] text-xs text-center mt-2">
+          سيتم حذف جميع بياناتك بشكل نهائي ولا يمكن استرجاعها
+        </p>
+      </div>
+
       <BottomNav />
     </div>
   );
