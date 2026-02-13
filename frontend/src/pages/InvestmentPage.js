@@ -153,6 +153,41 @@ function InvestmentPage() {
         </div>
       </div>
 
+      {/* Gold Provider Section */}
+      <div className="px-4 py-3" dir="rtl">
+        <Card className="bg-gradient-to-br from-[#1A1A1A] to-[#0D0D0D] border-[#D4AF37]/30 overflow-hidden">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-xl flex items-center justify-center border border-[#D4AF37]/30 flex-shrink-0">
+                <img src="/logo.png" alt="مزود الذهب" className="w-12 h-12 object-contain" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[#A1A1AA] text-xs mb-1">مزود الذهب المعتمد</p>
+                <h3 className="text-[#D4AF37] font-bold text-lg font-['Cairo']">زينة وخزينة للذهب</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">موثق ✓</span>
+                  <span className="bg-[#D4AF37]/20 text-[#D4AF37] text-xs px-2 py-0.5 rounded-full">ذهب معتمد LBMA</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-[#27272A] grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="text-[#D4AF37] font-bold">999.9</p>
+                <p className="text-[#A1A1AA] text-xs">نقاء الذهب</p>
+              </div>
+              <div>
+                <p className="text-[#D4AF37] font-bold">قطر</p>
+                <p className="text-[#A1A1AA] text-xs">بلد المنشأ</p>
+              </div>
+              <div>
+                <p className="text-[#D4AF37] font-bold">مرخص</p>
+                <p className="text-[#A1A1AA] text-xs">حالة الترخيص</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Gold Calculator */}
       <div className="px-4 py-3">
         <Card className="bg-[#0D0D0D] border-[#27272A]">
