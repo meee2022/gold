@@ -79,7 +79,7 @@ const GiftsPage = () => {
     setLoading(true);
     try {
       // Create gift voucher
-      const response = await apiCall("post", "/gifts/voucher", {
+      const res = await apiCall("post", "/gifts/voucher", {
         recipient_name: formData.recipientName,
         whatsapp_number: formData.whatsappNumber,
         amount_qar: parseFloat(formData.amount),
@@ -87,6 +87,8 @@ const GiftsPage = () => {
         message: formData.message,
         validity_days: 365 // صالحة لمدة سنة تلقائياً
       });
+      
+      const response = res.data;
       
       // Save voucher with additional info for display
       setSentVoucher({
