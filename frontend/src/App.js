@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import InvestmentPage from "./pages/InvestmentPage";
 import GiftsPage from "./pages/GiftsPage";
+import GiftCardPage from "./pages/GiftCardPage";
 import SendGiftPage from "./pages/SendGiftPage";
 import ReceiveGiftPage from "./pages/ReceiveGiftPage";
 import PortfolioPage from "./pages/PortfolioPage";
