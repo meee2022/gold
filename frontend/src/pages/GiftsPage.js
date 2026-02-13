@@ -272,9 +272,9 @@ const GiftsPage = () => {
           <h3 className="text-lg font-bold text-[#D4AF37] font-['Cairo'] mb-4 text-right">مناسبات مثالية</h3>
           <div className="grid grid-cols-2 gap-3">
             {occasions.map((occasion, index) => (
-              <div key={index} className="flex items-center gap-2 justify-end">
-                <span className="text-[#A1A1AA] text-sm">{occasion.text}</span>
+              <div key={index} className="flex items-center gap-2 flex-row-reverse justify-end">
                 <occasion.icon size={18} className={occasion.color} />
+                <span className="text-[#A1A1AA] text-sm text-right">{occasion.text}</span>
               </div>
             ))}
           </div>
