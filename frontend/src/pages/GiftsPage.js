@@ -230,6 +230,27 @@ const GiftsPage = () => {
               )}
             </div>
 
+            {/* Occasion */}
+            <div>
+              <label className="text-white text-sm mb-2 block text-right">المناسبة</label>
+              <Select value={formData.occasion} onValueChange={(value) => setFormData(prev => ({ ...prev, occasion: value }))}>
+                <SelectTrigger className="bg-[#0A0A0A] border-[#27272A] text-white h-12 rounded-xl">
+                  <SelectValue placeholder="اختر المناسبة" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1A1A1A] border-[#27272A]">
+                  <SelectItem value="birthday">🎂 عيد ميلاد</SelectItem>
+                  <SelectItem value="wedding">💍 زواج</SelectItem>
+                  <SelectItem value="graduation">🎓 تخرج</SelectItem>
+                  <SelectItem value="eid">🌙 عيد</SelectItem>
+                  <SelectItem value="newborn">👶 مولود جديد</SelectItem>
+                  <SelectItem value="anniversary">❤️ ذكرى زواج</SelectItem>
+                  <SelectItem value="promotion">🎉 ترقية</SelectItem>
+                  <SelectItem value="thank_you">🙏 شكر وتقدير</SelectItem>
+                  <SelectItem value="other">✨ مناسبة أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Personal Message */}
             <div>
               <label className="text-white text-sm mb-2 block text-right">رسالة شخصية</label>
@@ -242,22 +263,6 @@ const GiftsPage = () => {
                 data-testid="message-input"
               />
             </div>
-
-            {/* Validity */}
-            <div>
-              <label className="text-white text-sm mb-2 block text-right">صالحة لمدة (أيام)</label>
-              <Select value={formData.validityDays} onValueChange={(value) => setFormData(prev => ({ ...prev, validityDays: value }))}>
-                <SelectTrigger className="bg-[#0A0A0A] border-[#27272A] text-white h-12 rounded-xl">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1A1A1A] border-[#27272A]">
-                  <SelectItem value="7">7 أيام</SelectItem>
-                  <SelectItem value="14">14 يوم</SelectItem>
-                  <SelectItem value="30">30 يوم</SelectItem>
-                  <SelectItem value="60">60 يوم</SelectItem>
-                  <SelectItem value="90">90 يوم</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             {/* Submit Button */}
