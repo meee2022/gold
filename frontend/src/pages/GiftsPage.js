@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Gift, Send, MessageSquare, Clock, Shield, Smartphone, GraduationCap, Heart, PartyPopper, Star, Check, Scale } from "lucide-react";
+import { Gift, Send, MessageSquare, Clock, Shield, Smartphone, GraduationCap, Heart, PartyPopper, Star, Check, Scale, Copy } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
