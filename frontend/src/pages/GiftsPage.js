@@ -21,6 +21,7 @@ const GiftsPage = () => {
     validityDays: "30"
   });
   const [loading, setLoading] = useState(false);
+  const [sentVoucher, setSentVoucher] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
